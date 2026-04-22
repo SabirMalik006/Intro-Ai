@@ -1,10 +1,9 @@
-// components/DashboardSidebar.js
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function DashboardSidebar({ open, toggle }) {
+export default function DashboardSidebar({ open, toggle, isMobile }) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -18,35 +17,32 @@ export default function DashboardSidebar({ open, toggle }) {
     { label: "Settings", icon: "⚙️", href: "/dashboard/settings" },
   ];
 
+  const sidebarClasses = `
+    flex flex-col border-r border-slate-200 bg-white/80 backdrop-blur-xl h-full transition-all duration-300 ease-in-out
+    ${isMobile ? "fixed inset-y-0 left-0 z-40 shadow-2xl" : "relative"}
+    ${open ? "w-64" : "w-20"}
+    ${!open && isMobile ? "-translate-x-full" : "translate-x-0"}
+  `;
+
   return (
-    <aside
-      className={`${
-        open ? "w-64" : "w-20"
-      } bg-white border-r border-gray-200 min-h-screen transition-all duration-300 fixed lg:sticky top-0 left-0 z-40 flex flex-col`}
-    >
+    <aside className={sidebarClasses}>
       {/* Logo Section */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          {open ? (
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-blue-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">SH</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  Smart<span className="text-teal-600">Hire</span>
-                </h2>
-                <p className="text-xs text-gray-500">Dashboard</p>
-              </div>
-            </div>
-          ) : (
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-blue-600 rounded-xl flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-lg">SH</span>
-            </div>
-          )}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
+        <Link href="/" className="flex items-center gap-3 overflow-hidden">
+          <div className="min-w-[40px] w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+            <span className="text-white font-bold text-lg">SH</span>
+          </div>
+          <div className={`transition-opacity duration-200 ${open ? "opacity-100" : "opacity-0 w-0"}`}>
+            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
+              SmartHire
+            </h2>
+          </div>
+        </Link>
+
+        {!isMobile && (
           <button
             onClick={toggle}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
           >
             {open ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,87 +54,50 @@ export default function DashboardSidebar({ open, toggle }) {
               </svg>
             )}
           </button>
-        </div>
-      </div>
-
-      {/* User Profile */}
-      <div className="p-6 border-b border-gray-100">
-        {open ? (
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-teal-100 to-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-teal-700 font-bold text-lg">AJ</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 truncate">Alex Johnson</h3>
-              <p className="text-sm text-gray-500 truncate">Recruiter</p>
-            </div>
-          </div>
-        ) : (
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-blue-100 rounded-full flex items-center justify-center mx-auto">
-            <span className="text-teal-700 font-bold">AJ</span>
-          </div>
         )}
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 p-4 overflow-y-auto">
-        <div className="space-y-1">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`flex items-center rounded-xl p-3 transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-r from-teal-50 to-blue-50 text-teal-700 border border-teal-100"
-                    : "text-gray-600 hover:bg-gray-50"
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        {menuItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${isActive
+                  ? "bg-indigo-50 text-indigo-600 font-medium"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }`}
-              >
-                <span className="text-xl mr-3">{item.icon}</span>
-                {open && <span className="font-medium">{item.label}</span>}
-                {isActive && open && (
-                  <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
+            >
+              <span className={`text-xl transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
+                {item.icon}
+              </span>
+
+              <span className={`ml-3 whitespace-nowrap transition-all duration-300 ${open ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 absolute"}`}>
+                {item.label}
+              </span>
+
+              {isActive && (
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 rounded-l-full" />
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* Bottom Section */}
-      <div className="p-4 border-t border-gray-100">
-        {open ? (
-          <div className="space-y-3">
-            <button className="w-full flex items-center justify-center gap-2 p-3 text-sm text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Settings
-            </button>
-            <button className="w-full flex items-center justify-center gap-2 p-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
+      {/* User Profile / Bottom Section */}
+      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div className={`flex items-center gap-3 transition-all duration-300 ${open ? "justify-start" : "justify-center"}`}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+            AJ
           </div>
-        ) : (
-          <div className="flex flex-col items-center space-y-3">
-            <button className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-            <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
+
+          <div className={`overflow-hidden transition-all duration-300 ${open ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
+            <h4 className="text-sm font-semibold text-slate-900 truncate">Alex Johnson</h4>
+            <p className="text-xs text-slate-500 truncate">Recruiter Admin</p>
           </div>
-        )}
+        </div>
       </div>
     </aside>
   );
