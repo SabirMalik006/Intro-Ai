@@ -1,10 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function DashboardSidebar({ open, toggle, isMobile }) {
   const pathname = usePathname();
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+
+    const useDark = nextTheme === "dark";
+    document.documentElement.classList.toggle("dark", useDark);
+    localStorage.setItem("dashboard-theme", nextTheme);
+  };
 
   const menuItems = [
     { label: "Dashboard", icon: "📊", href: "/dashboard" },
@@ -15,34 +31,43 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     { label: "Reports", icon: "📋", href: "/dashboard/reports" },
     { label: "Messages", icon: "💬", href: "/dashboard/messages" },
     { label: "Settings", icon: "⚙️", href: "/dashboard/settings" },
+    { label: "Recruiter", icon: "💼", href: "/dashboard/recruiter"}
   ];
 
   const sidebarClasses = `
-    flex flex-col border-r border-slate-200 bg-white/80 backdrop-blur-xl h-full transition-all duration-300 ease-in-out
+    flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 backdrop-blur-xl h-full transition-all duration-300 ease-in-out
     ${isMobile ? "fixed inset-y-0 left-0 z-40 shadow-2xl" : "relative"}
-    ${open ? "w-64" : "w-20"}
+    ${open ? "w-64" : "w-24"}
     ${!open && isMobile ? "-translate-x-full" : "translate-x-0"}
   `;
 
   return (
     <aside className={sidebarClasses}>
       {/* Logo Section */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
-        <Link href="/" className="flex items-center gap-3 overflow-hidden">
+      <div
+        className={`h-16 relative flex items-center border-b border-slate-100 dark:border-slate-700 ${
+          open ? "justify-between px-4" : "justify-between px-2"
+        }`}
+      >
+        <Link
+          href="/"
+          className={`flex items-center overflow-hidden ${open ? "gap-3" : "justify-center w-10 flex-shrink-0"}`}
+        >
           <div className="min-w-[40px] w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
             <span className="text-white font-bold text-lg">SH</span>
           </div>
-          <div className={`transition-opacity duration-200 ${open ? "opacity-100" : "opacity-0 w-0"}`}>
-            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
+
+          {open && (
+            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300">
               SmartHire
             </h2>
-          </div>
+          )}
         </Link>
 
         {!isMobile && (
           <button
             onClick={toggle}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
             {open ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,8 +91,8 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
               key={item.label}
               href={item.href}
               className={`flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${isActive
-                  ? "bg-indigo-50 text-indigo-600 font-medium"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-medium"
+                  : "text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
             >
               <span className={`text-xl transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
@@ -87,15 +112,29 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       </nav>
 
       {/* User Profile / Bottom Section */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+      <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+        <button
+          onClick={toggleTheme}
+          className={`mb-4 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition ${open ? "flex items-center justify-between" : "flex items-center justify-center"}`}
+        >
+          {open ? (
+            <>
+              <span>{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
+              <span>{theme === "dark" ? "🌙" : "☀️"}</span>
+            </>
+          ) : (
+            <span>{theme === "dark" ? "🌙" : "☀️"}</span>
+          )}
+        </button>
+
         <div className={`flex items-center gap-3 transition-all duration-300 ${open ? "justify-start" : "justify-center"}`}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
             AJ
           </div>
 
           <div className={`overflow-hidden transition-all duration-300 ${open ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
-            <h4 className="text-sm font-semibold text-slate-900 truncate">Alex Johnson</h4>
-            <p className="text-xs text-slate-500 truncate">Recruiter Admin</p>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">Alex Johnson</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Recruiter Admin</p>
           </div>
         </div>
       </div>

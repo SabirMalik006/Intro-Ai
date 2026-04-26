@@ -19,7 +19,7 @@ export default function DashboardPage() {
             <h2 className="text-3xl font-bold mb-2">Welcome back, Alex! 👋</h2>
             <p className="text-indigo-100 text-lg">You have 3 upcoming interviews and 5 pending reviews</p>
           </div>
-          <button className="mt-6 md:mt-0 px-8 py-3 bg-white text-indigo-700 font-bold rounded-2xl hover:bg-indigo-50 transition-all duration-300 shadow-lg">
+          <button className="mt-6 md:mt-0 px-8 py-3 bg-white dark:bg-slate-900 text-indigo-700 font-bold rounded-2xl hover:bg-indigo-50 transition-all duration-300 shadow-lg">
             View Schedule
           </button>
         </div>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 p-8 shadow-sm">
           <h3 className="text-xl font-bold text-slate-800 mb-6">Quick Stats</h3>
           <div className="space-y-6">
             <div className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">

@@ -20,11 +20,11 @@ export default function PerformanceChart() {
   const maxValue = Math.max(...currentData);
   
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Interview Performance</h3>
-          <p className="text-gray-600 text-sm">Average candidate scores over time</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Interview Performance</h3>
+          <p className="text-gray-600 dark:text-slate-300 text-sm">Average candidate scores over time</p>
         </div>
         
         <div className="flex gap-2">
@@ -35,7 +35,7 @@ export default function PerformanceChart() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 timeRange === range
                   ? "bg-gradient-to-r from-teal-600 to-blue-600 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                  : "text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800"
               }`}
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -54,25 +54,25 @@ export default function PerformanceChart() {
                 className="w-full bg-gradient-to-t from-teal-500 to-blue-500 rounded-t-lg transition-all duration-500"
                 style={{ height: `${height}%` }}
               />
-              <span className="text-xs text-gray-500 mt-2">{labels[index]}</span>
+              <span className="text-xs text-gray-500 dark:text-slate-400 mt-2">{labels[index]}</span>
             </div>
           );
         })}
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-gray-100">
+      <div className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-gray-100 dark:border-slate-700">
         <div className="flex items-center">
           <div className="w-3 h-3 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full mr-2"></div>
-          <span className="text-sm text-gray-600">Candidate Score</span>
+          <span className="text-sm text-gray-600 dark:text-slate-300">Candidate Score</span>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">{currentData[currentData.length - 1]}/100</div>
-          <div className="text-sm text-gray-500">Current Average</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">{currentData[currentData.length - 1]}/100</div>
+          <div className="text-sm text-gray-500 dark:text-slate-400">Current Average</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">+{currentData[currentData.length - 1] - currentData[0]}</div>
-          <div className="text-sm text-gray-500">Improvement</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">+{currentData[currentData.length - 1] - currentData[0]}</div>
+          <div className="text-sm text-gray-500 dark:text-slate-400">Improvement</div>
         </div>
       </div>
     </div>

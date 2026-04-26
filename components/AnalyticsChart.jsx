@@ -15,10 +15,10 @@ export default function AnalyticsChart({ type, title, timeRange }) {
   const maxValue = Math.max(...data);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <span className="text-sm text-gray-600">Last {timeRange}</span>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
+        <span className="text-sm text-gray-600 dark:text-slate-300">Last {timeRange}</span>
       </div>
       
       <div className="h-64">
@@ -30,7 +30,7 @@ export default function AnalyticsChart({ type, title, timeRange }) {
                   className="w-full bg-gradient-to-t from-teal-500 to-blue-500 rounded-t-lg transition-all duration-500"
                   style={{ height: `${(value / maxValue) * 100}%` }}
                 />
-                <span className="text-xs text-gray-500 mt-2">
+                <span className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                   {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][index]}
                 </span>
               </div>
@@ -44,7 +44,7 @@ export default function AnalyticsChart({ type, title, timeRange }) {
                   className="w-16 bg-gradient-to-t from-teal-500 to-blue-500 rounded-t-lg transition-all duration-500"
                   style={{ height: `${(value / maxValue) * 100}%` }}
                 />
-                <span className="text-xs text-gray-500 mt-2">
+                <span className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                   {["0-2", "3-5", "6-7", "8-9", "10"][index]}
                 </span>
               </div>

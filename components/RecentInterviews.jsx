@@ -13,14 +13,14 @@ export default function RecentInterviews() {
         case 'completed': return 'bg-green-100 text-green-700';
         case 'pending': return 'bg-amber-100 text-amber-700';
         case 'scheduled': return 'bg-blue-100 text-blue-700';
-        default: return 'bg-gray-100 text-gray-700';
+        default: return 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-200';
       }
     };
   
     return (
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Interviews</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent Interviews</h3>
           <button className="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
             View All
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@ export default function RecentInterviews() {
   
         <div className="space-y-4">
           {interviews.map((interview) => (
-            <div key={interview.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+            <div key={interview.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-blue-100 rounded-lg flex items-center justify-center">
                   <span className="text-teal-700 font-semibold">
@@ -39,13 +39,13 @@ export default function RecentInterviews() {
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">{interview.name}</h4>
-                  <p className="text-sm text-gray-600">{interview.role}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-slate-100">{interview.name}</h4>
+                  <p className="text-sm text-gray-600 dark:text-slate-300">{interview.role}</p>
                 </div>
               </div>
               
               <div className="flex flex-col items-end">
-                <span className="text-sm text-gray-500">{interview.date}</span>
+                <span className="text-sm text-gray-500 dark:text-slate-400">{interview.date}</span>
                 <div className="flex items-center gap-3 mt-1">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(interview.status)}`}>
                     {interview.status.charAt(0).toUpperCase() + interview.status.slice(1)}
@@ -64,11 +64,11 @@ export default function RecentInterviews() {
         
         {interviews.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🎤</span>
             </div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">No interviews yet</h4>
-            <p className="text-gray-600 mb-4">Create your first AI-powered interview</p>
+            <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">No interviews yet</h4>
+            <p className="text-gray-600 dark:text-slate-300 mb-4">Create your first AI-powered interview</p>
             <button className="px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white rounded-xl hover:from-teal-700 hover:to-blue-700 transition-all duration-300 font-medium">
               + Create Interview
             </button>
