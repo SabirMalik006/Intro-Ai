@@ -1,16 +1,122 @@
-// app/register/page.js
 "use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { registerUser } from "../api/auth";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [userType, setUserType] = useState("recruiter");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    company: ""
+  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 8) newErrors.password = "Minimum 8 characters";
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match";
+    if (userType === "recruiter" && !formData.company.trim()) newErrors.company = "Company name is required";
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    setErrors({});
+    
+    try {
+      const userData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        role: userType,
+        ...(userType === "recruiter" && { company: formData.company }),
+      };
+
+      const response = await registerUser(userData);
+      
+      console.log("Registration successful:", response);
+      
+      // ✅ Redirect to LOGIN page (not dashboard)
+      router.push("/login?registered=true");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({ general: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 px-4 py-12">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-center gap-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{
+      background: "linear-gradient(180deg, #0a0a0f 0%, #13131a 100%)",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      {/* Animated Background Orbs */}
+      <div className="orb" style={{
+        width: 600, height: 600,
+        background: "radial-gradient(circle, rgba(200,241,53,0.4), transparent)",
+        top: "-10%", right: "-15%",
+        position: "absolute", borderRadius: "50%",
+        filter: "blur(80px)", opacity: 0.35,
+        animation: "float 14s ease infinite"
+      }} />
+      <div className="orb" style={{
+        width: 500, height: 500,
+        background: "radial-gradient(circle, rgba(59,91,252,0.35), transparent)",
+        bottom: "-10%", left: "-12%",
+        position: "absolute", borderRadius: "50%",
+        filter: "blur(80px)", opacity: 0.35,
+        animation: "float 18s ease infinite",
+        animationDelay: "-5s"
+      }} />
+      <div className="orb" style={{
+        width: 300, height: 300,
+        background: "radial-gradient(circle, rgba(255,107,53,0.25), transparent)",
+        top: "40%", left: "30%",
+        position: "absolute", borderRadius: "50%",
+        filter: "blur(80px)", opacity: 0.35,
+        animation: "float 22s ease infinite",
+        animationDelay: "-10s"
+      }} />
+
+      {/* Grid Background */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+        backgroundSize: "60px 60px",
+        pointerEvents: "none"
+      }} />
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-12px) rotate(1deg); }
+          66% { transform: translateY(-6px) rotate(-1deg); }
+        }
+      `}</style>
+
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-center gap-12" style={{ position: "relative", zIndex: 1 }}>
         {/* Left Side - Brand/Info */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -23,60 +129,42 @@ export default function RegisterPage() {
               <span className="text-white font-bold text-xl">SH</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Smart<span className="text-teal-600">Hire</span>
+              <h1 className="text-3xl font-bold text-white">
+                Smart<span className="text-teal-400">Hire</span>
               </h1>
-              <p className="text-gray-600">AI-Powered Hiring Platform</p>
+              <p className="text-gray-400">AI-Powered Hiring Platform</p>
             </div>
           </div>
           
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Join SmartHire Today
           </h2>
           
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-lg text-gray-400 mb-8">
             Start conducting intelligent, AI-powered interviews and transform your 
             hiring process with data-driven insights.
           </p>
           
-          {/* Features List */}
           <div className="space-y-4 mb-10">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
+            {[
+              "AI-powered interview conduction",
+              "Detailed candidate analytics",
+              "Bias-free evaluation system",
+              "Custom interview templates"
+            ].map((feature, i) => (
+              <div key={i} className="flex items-center">
+                <div className="w-8 h-8 bg-teal-900/30 rounded-lg flex items-center justify-center mr-3 border border-teal-500/20">
+                  <svg className="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-gray-300">{feature}</span>
               </div>
-              <span className="text-gray-700">AI-powered interview conduction</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-gray-700">Detailed candidate analytics</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-gray-700">Bias-free evaluation system</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-gray-700">Custom interview templates</span>
-            </div>
+            ))}
           </div>
           
-          <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-medium border border-teal-100">
-            <span className="flex h-2 w-2 bg-teal-500 rounded-full animate-pulse"></span>
+          <div className="inline-flex items-center gap-2 bg-teal-500/10 text-teal-300 px-4 py-2 rounded-full text-sm font-medium border border-teal-500/20">
+            <span className="flex h-2 w-2 bg-teal-400 rounded-full animate-pulse"></span>
             Start your 14-day free trial today
           </div>
         </motion.div>
@@ -88,29 +176,35 @@ export default function RegisterPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="lg:w-1/2 max-w-md w-full"
         >
-          <div className="bg-white border border-gray-200 p-8 rounded-2xl shadow-lg">
+          <div className="bg-gray-900/80 border border-gray-700/50 p-8 rounded-2xl shadow-2xl backdrop-blur-xl">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-white">
                 Create your account
               </h2>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-400 mt-2">
                 Fill in your details to get started
               </p>
             </div>
 
+            {errors.general && (
+              <div className="bg-red-900/30 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm mb-6">
+                {errors.general}
+              </div>
+            )}
+
             {/* User Type Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 I am a
               </label>
-              <div className="grid grid-cols-2 gap-3 text-gray-400">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setUserType("recruiter")}
                   className={`py-3 rounded-xl border transition-all ${
                     userType === "recruiter"
-                      ? "border-teal-500 bg-teal-50 text-teal-700"
-                      : "border-gray-300 hover:border-gray-400"
+                      ? "border-teal-500 bg-teal-500/10 text-teal-300"
+                      : "border-gray-600 text-gray-400 hover:border-gray-500"
                   }`}
                 >
                   👔 Recruiter
@@ -120,8 +214,8 @@ export default function RegisterPage() {
                   onClick={() => setUserType("candidate")}
                   className={`py-3 rounded-xl border transition-all ${
                     userType === "candidate"
-                      ? "border-teal-500 bg-teal-50 text-teal-700"
-                      : "border-gray-300 hover:border-gray-400"
+                      ? "border-teal-500 bg-teal-500/10 text-teal-300"
+                      : "border-gray-600 text-gray-400 hover:border-gray-500"
                   }`}
                 >
                   👨‍💻 Candidate
@@ -130,115 +224,127 @@ export default function RegisterPage() {
             </div>
 
             {/* Form */}
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Full Name
                 </label>
                 <input
                   type="text"
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all placeholder:text-gray-400"
-                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  className={`w-full px-4 py-3 rounded-xl border bg-gray-800 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all ${
+                    errors.fullName ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
+                {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Email address
                 </label>
                 <input
                   type="email"
                   placeholder="name@company.com"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all placeholder:text-gray-400"
-                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className={`w-full px-4 py-3 rounded-xl border bg-gray-800 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all ${
+                    errors.email ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
+                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Password
                 </label>
                 <input
                   type="password"
                   placeholder="Create a strong password"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all placeholder:text-gray-400"
-                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  className={`w-full px-4 py-3 rounded-xl border bg-gray-800 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all ${
+                    errors.password ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
-                <p className="text-xs text-gray-500 mt-1 ">
-                  Minimum 8 characters with letters and numbers
-                </p>
+                {errors.password ? (
+                  <p className="text-red-400 text-xs mt-1">{errors.password}</p>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">Minimum 8 characters with letters and numbers</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Confirm Password
                 </label>
                 <input
                   type="password"
                   placeholder="Re-enter your password"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all placeholder:text-gray-400"
-                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                  className={`w-full px-4 py-3 rounded-xl border bg-gray-800 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all ${
+                    errors.confirmPassword ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
+                {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
 
-              {/* Company Field (for recruiters only) */}
               {userType === "recruiter" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Company Name
                   </label>
                   <input
                     type="text"
                     placeholder="Your company"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all"
+                    value={formData.company}
+                    onChange={(e) => setFormData({...formData, company: e.target.value})}
+                    className={`w-full px-4 py-3 rounded-xl border bg-gray-800 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-all ${
+                      errors.company ? "border-red-500" : "border-gray-600"
+                    }`}
                   />
+                  {errors.company && <p className="text-red-400 text-xs mt-1">{errors.company}</p>}
                 </div>
               )}
 
-              {/* Terms and Conditions */}
               <div className="flex items-start pt-2">
                 <input
                   type="checkbox"
                   id="terms"
-                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded mt-1"
+                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-600 rounded mt-1"
                   required
                 />
-                <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="terms" className="ml-2 block text-sm text-gray-400">
                   I agree to the{" "}
-                  <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">
-                    Privacy Policy
-                  </a>
+                  <a href="#" className="text-teal-400 hover:text-teal-300 font-medium">Terms of Service</a>
+                  {" "}and{" "}
+                  <a href="#" className="text-teal-400 hover:text-teal-300 font-medium">Privacy Policy</a>
                 </label>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 mt-2 rounded-xl font-semibold text-white bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                disabled={loading}
+                className="w-full py-3.5 mt-2 rounded-xl font-semibold text-gray-900 bg-gradient-to-r from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
               
-              {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                  <span className="px-2 bg-gray-900 text-gray-500">Or sign up with</span>
                 </div>
               </div>
               
-              {/* Social Signup */}
-              <div className="grid grid-cols-2 gap-3 text-gray-400">
-                <button
-                  type="button"
-                  className="w-full py-3 rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors flex items-center justify-center"
-                >
+              <div className="grid grid-cols-2 gap-3">
+                <button type="button" className="w-full py-3 rounded-xl border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-center">
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -247,11 +353,8 @@ export default function RegisterPage() {
                   </svg>
                   Google
                 </button>
-                <button
-                  type="button"
-                  className="w-full py-3 rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors flex items-center justify-center "
-                >
-                  <svg className="w-5 h-5 mr-2  text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                <button type="button" className="w-full py-3 rounded-xl border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                   LinkedIn
@@ -259,13 +362,9 @@ export default function RegisterPage() {
               </div>
             </form>
 
-            {/* Footer */}
-            <p className="text-center text-gray-600 mt-8 text-sm">
+            <p className="text-center text-gray-400 mt-8 text-sm">
               Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-semibold text-teal-600 hover:text-teal-700 transition-colors"
-              >
+              <Link href="/login" className="font-semibold text-teal-400 hover:text-teal-300 transition-colors">
                 Sign in
               </Link>
             </p>

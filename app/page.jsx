@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import createGlobe from "cobe";
+import { isLoggedIn } from "./api/auth";
 
 // ─────────────────────────────────────────────
 // GLOBAL STYLES
@@ -202,6 +203,18 @@ const GlobalStyles = () => (
     }
     .footer-link:hover { color: var(--surface); }
 
+    .cta-visual-col {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      perspective: 1200;
+    }
+
+    .cta-cube-shell {
+      width: min(560px, 100%);
+      margin-right: -52px;
+    }
+
     /* Globe container */
     .globe-wrapper {
       position: relative;
@@ -241,6 +254,7 @@ const GlobalStyles = () => (
 
     @media (max-width: 900px) {
       .hide-mobile { display: none !important; }
+      .show-mobile { display: inline-flex !important; }
       .hero-title  { font-size: clamp(2.4rem, 10vw, 3.6rem) !important; }
       section { padding-left: 16px !important; padding-right: 16px !important; }
       .grid-responsive { grid-template-columns: 1fr !important; }
@@ -262,6 +276,15 @@ const GlobalStyles = () => (
       .hero-cta-btns {
         justify-content: center !important;
       }
+
+      .cta-visual-col {
+        justify-content: center !important;
+      }
+
+      .cta-cube-shell {
+        margin-right: 0 !important;
+        width: min(460px, 100%) !important;
+      }
     }
 
     @media (max-width: 480px) {
@@ -272,7 +295,13 @@ const GlobalStyles = () => (
         // margin-bottom: 0px;
         // background-color : red;
       }
+
+      .cta-cube-shell {
+        width: min(340px, 100%) !important;
+      }
     }
+
+    .show-mobile { display: none; }
   `}</style>
 );
 
@@ -489,11 +518,27 @@ function GlobePulse({ markers = defaultMarkers, speed = 0.003 }) {
 // ─────────────────────────────────────────────
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navLinks = ["Features", "How It Works", "Pricing", "Testimonials"];
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  useEffect(() => {
+    setLoggedIn(isLoggedIn());
+  }, []);
+
+  useEffect(() => {
+    const closeOnResize = () => {
+      if (window.innerWidth > 900) setMenuOpen(false);
+    };
+
+    window.addEventListener("resize", closeOnResize);
+    return () => window.removeEventListener("resize", closeOnResize);
   }, []);
 
   return (
@@ -504,23 +549,157 @@ function Navbar() {
       backdropFilter: scrolled ? "blur(24px)" : "none",
       borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
     }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 0", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 3vw, 40px)", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, background: "#c8f135", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚡</div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--surface)" }}>SmartHire</span>
         </a>
 
         <div className="hide-mobile" style={{ display: "flex", gap: 36 }}>
-          {["Features", "How It Works", "Pricing", "Testimonials"].map((label) => (
+          {navLinks.map((label) => (
             <a key={label} href={`#${label.toLowerCase().replace(/ /g, "-")}`} className="nav-link">{label}</a>
           ))}
         </div>
 
         <div className="hide-mobile" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <a href="/login" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px" }}>Sign in</a>
+          {!loggedIn && (
+            <a href="/login" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px" }}>Sign in</a>
+          )}
           <a href="/register" className="btn-primary" style={{ padding: "10px 24px", fontSize: 14 }}>Get Started</a>
         </div>
+
+        <button
+          type="button"
+          className="show-mobile"
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((prev) => !prev)}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            border: "1px solid rgba(255,255,255,0.14)",
+            background: "rgba(255,255,255,0.04)",
+            color: "var(--surface)",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            position: "relative",
+          }}
+        >
+          <span style={{
+            position: "absolute",
+            width: 18,
+            height: 2,
+            background: "currentColor",
+            borderRadius: 2,
+            transition: "transform 0.3s ease, top 0.3s ease",
+            top: menuOpen ? 21 : 15,
+            transform: menuOpen ? "rotate(45deg)" : "rotate(0deg)",
+          }} />
+          <span style={{
+            position: "absolute",
+            width: 18,
+            height: 2,
+            background: "currentColor",
+            borderRadius: 2,
+            transition: "opacity 0.2s ease",
+            top: 21,
+            opacity: menuOpen ? 0 : 1,
+          }} />
+          <span style={{
+            position: "absolute",
+            width: 18,
+            height: 2,
+            background: "currentColor",
+            borderRadius: 2,
+            transition: "transform 0.3s ease, top 0.3s ease",
+            top: menuOpen ? 21 : 27,
+            transform: menuOpen ? "rotate(-45deg)" : "rotate(0deg)",
+          }} />
+        </button>
       </div>
+
+      <motion.div
+        initial={false}
+        animate={{
+          height: menuOpen ? "auto" : 0,
+          opacity: menuOpen ? 1 : 0,
+        }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          overflow: "hidden",
+          pointerEvents: menuOpen ? "auto" : "none",
+          borderTop: menuOpen ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(255,255,255,0)",
+          background: "rgba(10,10,15,0.96)",
+        }}
+      >
+        <div
+          className="show-mobile"
+          style={{
+            width: "100%",
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "14px clamp(16px, 3vw, 40px) 18px",
+            flexDirection: "column",
+            gap: 8,
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          {navLinks.map((label) => (
+            <a
+              key={label}
+              href={`#${label.toLowerCase().replace(/ /g, "-")}`}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                color: "rgba(240,239,232,0.8)",
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 500,
+                padding: "10px 4px",
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                width: "100%",
+              }}
+            >
+              {label}
+            </a>
+          ))}
+
+          {!loggedIn && (
+            <a
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              style={{
+                color: "rgba(240,239,232,0.8)",
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 500,
+                padding: "12px 4px 4px",
+                width: "100%",
+              }}
+            >
+              Sign in
+            </a>
+          )}
+
+          <a
+            href="/dashboard"
+            onClick={() => setMenuOpen(false)}
+            style={{
+              textDecoration: "none",
+              background: "#c8f135",
+              color: "#0a0a0f",
+              fontWeight: 700,
+              borderRadius: 999,
+              padding: "10px 18px",
+              marginTop: 4,
+            }}
+          >
+            Get Started
+          </a>
+        </div>
+      </motion.div>
     </nav>
   );
 }
@@ -554,7 +733,7 @@ function Hero() {
         backgroundSize: "60px 60px",
       }} />
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1, width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1, width: "100%", padding: "0 clamp(16px, 3vw, 40px)" }}>
         <div className="hero-inner">
 
           {/* LEFT: Text column */}
@@ -2270,10 +2449,8 @@ function CTA() {
             <p style={{ color: "#8a8a96", fontSize: 13 }}>No credit card required · Cancel anytime · 24/7 Support</p>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", perspective: 1200 }}>
-            <div style={{
-              width: "min(560px, 100%)",
-              marginRight: "-52px",
+          <div className="cta-visual-col">
+            <div className="cta-cube-shell" style={{
               borderRadius: 24,
               overflow: "hidden",
               border: "none",
