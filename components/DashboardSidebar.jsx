@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import useAuthStore from "../store/authStore";
 
 export default function DashboardSidebar({ open, toggle, isMobile }) {
   const pathname = usePathname();
   const [theme, setTheme] = useState("light");
+  const [mounted, setMounted] = useState(false);
+  const { user } = useAuthStore();
 
   useEffect(() => {
+    setMounted(true);
     const isDark = document.documentElement.classList.contains("dark");
     setTheme(isDark ? "dark" : "light");
   }, []);
@@ -24,6 +28,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
 
   const menuItems = [
     { label: "Dashboard", icon: "📊", href: "/dashboard" },
+    { label: "Explore Jobs", icon: "🌐", href: "/dashboard/explore-jobs" },
     { label: "Interviews", icon: "🎤", href: "/dashboard/interviews" },
     { label: "Candidates", icon: "👥", href: "/dashboard/candidates" },
     { label: "Templates", icon: "📝", href: "/dashboard/templates" },
@@ -31,8 +36,14 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     { label: "Reports", icon: "📋", href: "/dashboard/reports" },
     { label: "Messages", icon: "💬", href: "/dashboard/messages" },
     { label: "Settings", icon: "⚙️", href: "/dashboard/settings" },
-    { label: "Recruiter", icon: "💼", href: "/dashboard/recruiter"}
-  ];
+    { label: "Recruiter", icon: "💼", href: "/dashboard/recruiter", recruiterOnly: true },
+    { label: "Resume Analyzer", icon: "📄", href: "/dashboard/resume-analyzer" }
+  ].filter(item => {
+    if (!item.recruiterOnly) return true;
+    if (!mounted) return false; // Hide recruiter-only items during SSR to match initial client state
+    const role = (user?.role || '').toLowerCase().trim();
+    return role.includes('recruit') || role === 'admin';
+  });
 
   const sidebarClasses = `
     flex flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 backdrop-blur-xl h-full transition-all duration-300 ease-in-out
@@ -45,9 +56,8 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     <aside className={sidebarClasses}>
       {/* Logo Section */}
       <div
-        className={`h-16 relative flex items-center border-b border-slate-100 dark:border-slate-700 ${
-          open ? "justify-between px-4" : "justify-between px-2"
-        }`}
+        className={`h-16 relative flex items-center border-b border-slate-100 dark:border-slate-700 ${open ? "justify-between px-4" : "justify-between px-2"
+          }`}
       >
         <Link
           href="/"
@@ -91,8 +101,8 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
               key={item.label}
               href={item.href}
               className={`flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${isActive
-                  ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-medium"
-                  : "text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-medium"
+                : "text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
             >
               <span className={`text-xl transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
@@ -128,13 +138,13 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
         </button>
 
         <div className={`flex items-center gap-3 transition-all duration-300 ${open ? "justify-start" : "justify-center"}`}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
-            AJ
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white dark:ring-slate-800">
+            {user?.fullName?.charAt(0) || "U"}
           </div>
 
           <div className={`overflow-hidden transition-all duration-300 ${open ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">Alex Johnson</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Recruiter Admin</p>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.fullName || "Guest"}</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate capitalize">{user?.role || "Candidate"}</p>
           </div>
         </div>
       </div>

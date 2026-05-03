@@ -565,7 +565,7 @@ function Navbar() {
           {!loggedIn && (
             <a href="/login" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px" }}>Sign in</a>
           )}
-          <a href="/register" className="btn-primary" style={{ padding: "10px 24px", fontSize: 14 }}>Get Started</a>
+          <a href="/dashboard" className="btn-primary" style={{ padding: "10px 24px", fontSize: 14 }}>Get Started</a>
         </div>
 
         <button
