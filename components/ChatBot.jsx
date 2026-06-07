@@ -325,12 +325,12 @@ const ChatBot = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-end gap-5 mb-12 mr-1 pointer-events-auto"
+            className="flex flex-col items-end gap-2.5 mb-20 mr-2 pointer-events-auto"
           >
             {quickQuestions.map((q, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: 30, scale: 0.8 }}
+                initial={{ opacity: 0, x: 40, scale: 0.8 }}
                 animate={{ 
                   opacity: 1, 
                   x: 0, 
@@ -350,19 +350,13 @@ const ChatBot = () => {
               >
                 <button
                   onClick={() => handleQuickQuestion(q)}
-                  className="relative z-10 bg-white dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-700 dark:text-slate-200 hover:text-white dark:hover:text-white px-7 py-4 rounded-[1.8rem] rounded-br-none shadow-[0_12px_35px_rgb(0,0,0,0.12)] hover:shadow-[0_20px_45px_rgba(37,99,235,0.35)] border border-slate-100 dark:border-slate-700 text-[15px] font-semibold transition-all duration-300 hover:-translate-y-1.5 active:scale-95 whitespace-nowrap flex items-center gap-3"
+                  className="relative z-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-700 dark:text-slate-200 hover:text-white dark:hover:text-white !px-4 !py-2 rounded-t-2xl rounded-bl-2xl rounded-br-none shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.4)] border border-white/20 dark:border-slate-700/50 text-[12px] font-bold transition-all duration-300 hover:-translate-y-1 active:scale-95 whitespace-nowrap flex items-center gap-2"
                 >
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 group-hover:bg-blue-200 animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:bg-white shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                   {q}
                 </button>
-                {/* Message Bubble Tail - Improved Robustness */}
-                <div 
-                  className="absolute -bottom-2.5 right-0 w-8 h-8 overflow-hidden pointer-events-none"
-                >
-                  <div 
-                    className="absolute top-0 right-0 w-5 h-5 bg-white dark:bg-slate-800 group-hover:bg-blue-600 border-r border-b border-slate-100 dark:border-slate-700 group-hover:border-blue-600 transition-all duration-300 origin-top-right rotate-[25deg]"
-                  />
-                </div>
+                {/* Unique Asymmetrical Decoration */}
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500/20 rounded-full blur-sm group-hover:bg-white/40 transition-colors"></div>
               </motion.div>
             ))}
           </motion.div>
