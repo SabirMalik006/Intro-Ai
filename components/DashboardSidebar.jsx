@@ -138,13 +138,21 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
         </button>
 
         <div className={`flex items-center gap-3 transition-all duration-300 ${open ? "justify-start" : "justify-center"}`}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white dark:ring-slate-800">
-            {user?.fullName?.charAt(0) || "U"}
-          </div>
+          {mounted ? (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white dark:ring-slate-800">
+              {user?.fullName?.charAt(0) || "U"}
+            </div>
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse" />
+          )}
 
           <div className={`overflow-hidden transition-all duration-300 ${open ? "w-auto opacity-100" : "w-0 opacity-0"}`}>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.fullName || "Guest"}</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate capitalize">{user?.role || "Candidate"}</p>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+              {mounted ? (user?.fullName || "Guest") : ""}
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate capitalize">
+              {mounted ? (user?.role || "Candidate") : ""}
+            </p>
           </div>
         </div>
       </div>

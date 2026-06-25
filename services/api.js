@@ -7,14 +7,19 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request Interceptor
+let isRefreshing = false;
+let refreshQueue = [];
+
+const processQueue = (error, token = null) => {
+  refreshQueue.forEach(prom => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  refreshQueue = [];
+};
+
 api.interceptors.request.use(
   (config) => {
-    // In a real app with Clerk/JWT, we'd attach the token here
-    // const token = await window.Clerk?.session?.getToken();
-    // if (token) config.headers.Authorization = `Bearer ${token}`;
-    
-    // For now, assume cookies are used or token is in localStorage
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -24,33 +29,62 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle Network Errors
     if (!error.response) {
-      // Toast or notify user about no internet
-      console.error('Network Error: No internet connection');
       return Promise.reject({
         message: 'No internet connection. Please check your network.',
         code: 'NETWORK_ERROR'
       });
     }
 
-    // Handle 401 Unauthorized
     if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      // Redirect to login or refresh token
-      if (typeof window !== 'undefined') {
-        // window.location.href = '/login';
+      if (originalRequest.url === '/auth/refresh-token') {
+        return Promise.reject(error.response.data);
       }
-      return Promise.reject(error.response.data);
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          refreshQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const res = await axios.post(
+          `${API_URL}/auth/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
+
+        const newToken = res.data?.data?.accessToken;
+        if (!newToken) throw new Error('No token returned');
+
+        localStorage.setItem('accessToken', newToken);
+        processQueue(null, newToken);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError.response?.data || { message: 'Session expired. Please login again.' });
+      } finally {
+        isRefreshing = false;
+      }
     }
 
-    // Handle 500 Server Errors
     if (error.response.status >= 500) {
       return Promise.reject({
         ...error.response.data,
@@ -58,7 +92,6 @@ api.interceptors.response.use(
       });
     }
 
-    // Return structured error
     return Promise.reject(error.response.data || { message: 'An unknown error occurred' });
   }
 );
