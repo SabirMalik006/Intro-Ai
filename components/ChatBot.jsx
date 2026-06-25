@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, User, Sparkles, Mic, Paperclip, MessageSquare, RefreshCw } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles, Mic, Paperclip, MessageSquare, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import api from '@/services/api';
 
 const ChatBot = () => {
@@ -12,6 +12,8 @@ const ChatBot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [showQuickQuestions, setShowQuickQuestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [dismissBubbles, setDismissBubbles] = useState(false);
   const messagesEndRef = useRef(null);
 
   const quickQuestions = [
@@ -191,6 +193,16 @@ const ChatBot = () => {
               <div className="flex items-center gap-1.5 relative z-10">
                 <button 
                   type="button"
+                  onClick={() => setShowSuggestions(!showSuggestions)}
+                  title={showSuggestions ? "Hide Questions" : "Show Questions"}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${
+                    showSuggestions ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  {showSuggestions ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                </button>
+                <button 
+                  type="button"
                   onClick={resetChat}
                   title="Reset Chat"
                   className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90"
@@ -276,6 +288,23 @@ const ChatBot = () => {
                 </div>
               )}
               <div ref={messagesEndRef} />
+
+              {showSuggestions && messages.length <= 2 && !isLoading && (
+                <div className="pt-4 pb-2 space-y-2">
+                  <p className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Quick Questions</p>
+                  <div className="flex flex-wrap gap-2">
+                    {quickQuestions.map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleQuickQuestion(q)}
+                        className="text-[11px] font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white border border-blue-100 dark:border-blue-800/50 transition-all active:scale-95"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Input Area - Scaled Down Padding */}
@@ -320,13 +349,20 @@ const ChatBot = () => {
 
       {/* Quick Question Bubbles */}
       <AnimatePresence>
-        {!isOpen && showQuickQuestions && (
+        {!isOpen && showQuickQuestions && !dismissBubbles && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-end gap-2.5 mb-20 mr-2 pointer-events-auto"
+            exit={{ opacity: 0, x: 100 }}
+            className="flex flex-col items-end gap-2.5 mb-20 mr-2 pointer-events-auto relative"
           >
+            <button
+              onClick={() => setDismissBubbles(true)}
+              className="absolute -top-2 -right-2 z-20 w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-red-500 dark:hover:bg-red-500 hover:text-white flex items-center justify-center shadow-lg transition-all active:scale-90"
+              title="Hide questions"
+            >
+              <X size={12} />
+            </button>
             {quickQuestions.map((q, i) => (
               <motion.div
                 key={i}
@@ -355,7 +391,6 @@ const ChatBot = () => {
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:bg-white shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                   {q}
                 </button>
-                {/* Unique Asymmetrical Decoration */}
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500/20 rounded-full blur-sm group-hover:bg-white/40 transition-colors"></div>
               </motion.div>
             ))}
