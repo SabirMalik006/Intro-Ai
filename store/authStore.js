@@ -37,9 +37,6 @@ const useAuthStore = create((set, get) => ({
   updatePassword: async (currentPassword, newPassword) => {
     try {
       const res = await api.put('/auth/update-password', { currentPassword, newPassword });
-      if (res.data.data?.accessToken) {
-        localStorage.setItem('accessToken', res.data.data.accessToken);
-      }
       return { success: true, message: res.data.message };
     } catch (error) {
       return { success: false, message: error.response?.data?.message || 'Failed to update password' };
@@ -49,7 +46,6 @@ const useAuthStore = create((set, get) => ({
   deleteAccount: async (password) => {
     try {
       const res = await api.delete('/auth/delete-account', { data: { password } });
-      localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
       set({ user: null });
       return { success: true, message: res.data.message };
@@ -59,7 +55,6 @@ const useAuthStore = create((set, get) => ({
   },
 
   logout: () => {
-    localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     set({ user: null });
     if (typeof window !== 'undefined') {

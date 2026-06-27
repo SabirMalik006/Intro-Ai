@@ -31,7 +31,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     { label: "Explore Jobs", icon: "🌐", href: "/dashboard/explore-jobs" },
     { label: "Saved Jobs", icon: "🔖", href: "/dashboard/saved-jobs" },
     { label: "Interviews", icon: "🎤", href: "/dashboard/interviews" },
-    { label: "Candidates", icon: "👥", href: "/dashboard/candidates" },
+    { label: "Candidates", icon: "👥", href: "/dashboard/candidates", recruiterOnly: true },
     { label: "Templates", icon: "📝", href: "/dashboard/templates" },
     { label: "Analytics", icon: "📈", href: "/dashboard/analytics" },
     { label: "Reports", icon: "📋", href: "/dashboard/reports" },
@@ -41,7 +41,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     { label: "Resume Analyzer", icon: "📄", href: "/dashboard/resume-analyzer" }
   ].filter(item => {
     if (!item.recruiterOnly) return true;
-    if (!mounted) return false; // Hide recruiter-only items during SSR to match initial client state
+    if (!mounted) return false;
     const role = (user?.role || '').toLowerCase().trim();
     return role.includes('recruit') || role === 'admin';
   });

@@ -1,12 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import useAuthStore from "@/store/authStore";
 import { ToastProvider } from "@/components/Toast";
 
+const recruiterOnlyPaths = ['/dashboard/candidates', '/dashboard/recruiter', '/dashboard/candidate'];
+
 export default function DashboardLayout({ children }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -19,12 +27,24 @@ export default function DashboardLayout({ children }) {
       }
     };
 
-    // Initial check
     handleResize();
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // ─── Route Guard ───
+  useEffect(() => {
+    if (!user) return;
+    const role = (user.role || '').toLowerCase().trim();
+    const isRecruiter = role.includes('recruit') || role === 'admin';
+    const isRestricted = recruiterOnlyPaths.some(p => pathname.startsWith(p));
+
+    if (isRestricted && !isRecruiter) {
+      router.replace('/dashboard');
+    } else {
+      setAuthorized(true);
+    }
+  }, [user, pathname, router]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -56,7 +76,14 @@ export default function DashboardLayout({ children }) {
           )}
 
           <ToastProvider>
-            {children}
+            {authorized ? children : (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                  <div className="w-14 h-14 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-slate-500 font-bold">Checking access...</p>
+                </div>
+              </div>
+            )}
           </ToastProvider>
         </div>
       </main>
