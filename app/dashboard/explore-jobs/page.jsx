@@ -578,6 +578,11 @@ export default function ExploreJobsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
+                      {job.hasApplied && (
+                        <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider border shadow-sm bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 flex items-center gap-1">
+                          <span className="text-[8px]">✓</span> Applied
+                        </span>
+                      )}
                       <button
                         onClick={(e) => { e.preventDefault(); toggleBookmark(job._id); }}
                         disabled={bookmarkLoading[job._id]}

@@ -14,7 +14,9 @@ import JobPostForm from "@/components/recruiter/JobPostForm";
 // =============================================
 // APPLICANT DETAILS MODAL
 // =============================================
-function ApplicantDetailsModal({ applicant, isOpen, onClose, onStatusChange, updatingAppId }) {
+function ApplicantDetailsModal({ applicant, isOpen, onClose, onStatusChange, onAssignInterview, interviewReport, showReportOnly, updatingAppId }) {
+  const [showReport, setShowReport] = useState(showReportOnly || false);
+  const report = interviewReport || applicant._interviewReport;
   if (!isOpen || !applicant) return null;
 
   return (
@@ -112,6 +114,96 @@ function ApplicantDetailsModal({ applicant, isOpen, onClose, onStatusChange, upd
             <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400 leading-relaxed italic">
               {applicant.coverLetter || "No cover letter provided by the candidate."}
             </div>
+          </div>
+
+          {/* Interview Section */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Interview</h3>
+
+            {!showReport ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => onAssignInterview(applicant._id)}
+                  className="px-5 py-2.5 rounded-2xl text-xs font-black transition-all border-2 active:scale-95 bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 flex items-center gap-2"
+                >
+                  🎤 Assign AI Interview
+                </button>
+                {report && (
+                  <button
+                    onClick={() => setShowReport(true)}
+                    className="px-5 py-2.5 rounded-2xl text-xs font-black transition-all border-2 active:scale-95 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 flex items-center gap-2"
+                  >
+                    📋 View Report
+                  </button>
+                )}
+              </div>
+            ) : report ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-base font-black text-slate-800 dark:text-white">Interview Report</h4>
+                  <button onClick={() => setShowReport(false)} className="text-xs font-bold text-indigo-600 hover:text-indigo-700">Close</button>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: 'Overall Score', value: `${report.overallScore || report.score}%`, color: 'indigo' },
+                    { label: 'Recommendation', value: report.recommendation || 'Consider', color: report.recommendation === 'Strong Hire' ? 'emerald' : report.recommendation === 'Hire' ? 'blue' : report.recommendation === 'Consider' ? 'amber' : 'red' },
+                    { label: 'Questions', value: report.totalQuestions || report.detailedFeedback?.length || '—', color: 'violet' },
+                    { label: 'Completed', value: report.completedAt ? new Date(report.completedAt).toLocaleDateString() : '—', color: 'teal' },
+                  ].map((stat, i) => (
+                    <div key={i} className={`p-3 rounded-xl bg-${stat.color}-50 dark:bg-${stat.color}-900/20 border border-${stat.color}-200 dark:border-${stat.color}-800 text-center`}>
+                      <div className={`text-lg font-extrabold text-${stat.color}-600 dark:text-${stat.color}-400`}>{stat.value}</div>
+                      <p className={`text-[10px] font-bold text-${stat.color}-500 dark:text-${stat.color}-400 mt-0.5`}>{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {report.summary && (
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700">
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Summary</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-200">{report.summary}</p>
+                  </div>
+                )}
+
+                {report.strengths?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-emerald-600 mb-2 uppercase tracking-wider">Strengths</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {report.strengths.map((s, i) => (
+                        <span key={i} className="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-lg border border-emerald-200 dark:border-emerald-800">✅ {s}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {report.areasForImprovement?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-amber-600 mb-2 uppercase tracking-wider">Areas to Improve</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {report.areasForImprovement.map((a, i) => (
+                        <span key={i} className="px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-lg border border-amber-200 dark:border-amber-800">💪 {a}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {report.detailedFeedback?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Question Feedback</p>
+                    <div className="space-y-2">
+                      {report.detailedFeedback.map((f, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700">
+                          <p className="text-xs font-bold text-indigo-600 mb-0.5">Q{f.questionNumber || i + 1}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400">{f.feedback}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">No interview report available yet.</p>
+            )}
           </div>
 
           {/* Status Actions */}
@@ -272,7 +364,7 @@ function StatCard({ icon, label, value, trend, color, delay = 0 }) {
 // =============================================
 // JOB CARD
 // =============================================
-function JobCard({ job, index, onDelete, onEdit, onUpdateApplicationStatus, onViewApplicant }) {
+function JobCard({ job, index, onDelete, onEdit, onUpdateApplicationStatus, onViewApplicant, onAssignInterview, assigningId }) {
   const [expanded, setExpanded] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [updatingAppId, setUpdatingAppId] = useState(null);
@@ -407,6 +499,18 @@ function JobCard({ job, index, onDelete, onEdit, onUpdateApplicationStatus, onVi
                       </div>
                     </div>
                     
+                    <button
+                      onClick={() => onAssignInterview(job._id, app.candidate || app._id, app)}
+                      disabled={assigningId === (app.candidate || app._id)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all disabled:opacity-50"
+                      title="Assign AI Interview"
+                    >
+                      {assigningId === (app.candidate || app._id) ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v3m0 0h3m-3 0H9" /></svg>
+                      )}
+                    </button>
                     <button 
                       onClick={() => onViewApplicant(app)}
                       className="p-1.5 bg-slate-50 dark:bg-slate-700 rounded-lg text-slate-400 hover:text-indigo-600 transition-colors"
@@ -434,10 +538,13 @@ export default function RecruiterDashboard() {
   const [notification, setNotification] = useState(null);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [showApplicantModal, setShowApplicantModal] = useState(false);
+  const [assigningId, setAssigningId] = useState(null);
+  const [interviewReports, setInterviewReports] = useState({});
   
   const { 
     jobs, loading, error, analytics, 
-    fetchMyJobs, fetchAnalytics, createJob, updateJob, deleteJob, updateApplicationStatus 
+    fetchMyJobs, fetchAnalytics, createJob, updateJob, deleteJob, updateApplicationStatus,
+    assignInterview
   } = useJobStore();
 
   useEffect(() => {
@@ -452,6 +559,23 @@ export default function RecruiterDashboard() {
 
   const handleViewApplicant = (applicant) => {
     setSelectedApplicant(applicant);
+    setShowApplicantModal(true);
+  };
+
+  const handleAssignInterview = async (jobId, candidateId, app) => {
+    setAssigningId(candidateId || app._id);
+    const res = await assignInterview(jobId, candidateId || app.candidate);
+    setAssigningId(null);
+    if (res.success) {
+      showNotification('AI Interview assigned successfully! 🎤');
+      fetchAnalytics();
+    } else {
+      showNotification(res.message || 'Failed to assign interview', 'error');
+    }
+  };
+
+  const handleViewInterviewReport = (applicant) => {
+    setSelectedApplicant({ ...applicant, _interviewReport: interviewReports[applicant._id] });
     setShowApplicantModal(true);
   };
 
@@ -659,6 +783,8 @@ export default function RecruiterDashboard() {
                 onEdit={handleEdit}
                 onUpdateApplicationStatus={handleUpdateApplicationStatus}
                 onViewApplicant={handleViewApplicant}
+                onAssignInterview={handleAssignInterview}
+                assigningId={assigningId}
               />
             ))}
             {(activeTab === "active" ? activeJobs : activeTab === "draft" ? draftJobs : closedJobs).length === 0 && !loading && (
@@ -720,6 +846,8 @@ export default function RecruiterDashboard() {
               handleUpdateApplicationStatus(selectedApplicant.jobId || selectedApplicant.job, appId, { status: newStatus });
               setSelectedApplicant(prev => ({ ...prev, status: newStatus }));
             }}
+            onAssignInterview={(appId) => handleAssignInterview(selectedApplicant.jobId || selectedApplicant.job, appId, selectedApplicant)}
+            interviewReport={interviewReports[selectedApplicant?._id]}
           />
         )}
       </AnimatePresence>

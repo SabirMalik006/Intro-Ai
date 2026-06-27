@@ -47,6 +47,12 @@ const useJobStore = create((set, get) => ({
       formData.append('resume', applicationData.resume);
 
       const response = await api.post(`/jobs/${id}/apply`, formData);
+      // Update hasApplied flag for this job in local state
+      set((state) => ({
+        jobs: state.jobs.map((job) =>
+          job._id === id ? { ...job, hasApplied: true } : job
+        ),
+      }));
       return { success: true, message: response.data.message };
     } catch (error) {
       console.error('Apply Error:', error.response?.data || error.message);
@@ -191,6 +197,42 @@ const useJobStore = create((set, get) => ({
 
   isJobSaved: (jobId) => {
     return get().savedJobIds.includes(jobId);
+  },
+
+  // ─── Interview Assignment ───
+  assignedInterviews: [],
+  interviewLoading: false,
+
+  assignInterview: async (jobId, candidateId) => {
+    try {
+      const res = await api.post('/interviews/assign', { jobId, candidateId });
+      return { success: true, message: res.data.message, assignment: res.data.data.assignment };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to assign interview' };
+    }
+  },
+
+  fetchRecruiterInterviews: async (status) => {
+    set({ interviewLoading: true });
+    try {
+      const url = status ? `/interviews/recruiter?status=${status}` : '/interviews/recruiter';
+      const res = await api.get(url);
+      set({ assignedInterviews: res.data.data.interviews, interviewLoading: false });
+      return res.data.data.interviews;
+    } catch (error) {
+      set({ interviewLoading: false });
+      return [];
+    }
+  },
+
+  fetchMyInterviews: async (status) => {
+    try {
+      const url = status ? `/interviews/mine?status=${status}` : '/interviews/mine';
+      const res = await api.get(url);
+      return res.data.data.interviews;
+    } catch (error) {
+      return [];
+    }
   },
 
   clearError: () => set({ error: null }),
