@@ -152,6 +152,47 @@ const useJobStore = create((set, get) => ({
     }
   },
 
+  // ─── Bookmark / Saved Jobs ───
+  savedJobIds: [],
+
+  fetchSavedJobs: async () => {
+    try {
+      const res = await api.get('/jobs/saved');
+      const savedIds = res.data.data.jobs.map(j => j._id);
+      set({ savedJobIds: savedIds });
+      return res.data.data.jobs;
+    } catch (error) {
+      console.error('Failed to fetch saved jobs:', error);
+      return [];
+    }
+  },
+
+  saveJob: async (jobId) => {
+    try {
+      await api.post(`/jobs/${jobId}/save`);
+      set((state) => ({ savedJobIds: [...state.savedJobIds, jobId] }));
+      return { success: true, message: 'Job saved successfully!' };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to save job' };
+    }
+  },
+
+  unsaveJob: async (jobId) => {
+    try {
+      await api.delete(`/jobs/${jobId}/save`);
+      set((state) => ({
+        savedJobIds: state.savedJobIds.filter(id => id !== jobId)
+      }));
+      return { success: true, message: 'Job removed from saved' };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to unsave job' };
+    }
+  },
+
+  isJobSaved: (jobId) => {
+    return get().savedJobIds.includes(jobId);
+  },
+
   clearError: () => set({ error: null }),
 }));
 

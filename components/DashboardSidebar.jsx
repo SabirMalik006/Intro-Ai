@@ -29,6 +29,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
   const menuItems = [
     { label: "Dashboard", icon: "📊", href: "/dashboard" },
     { label: "Explore Jobs", icon: "🌐", href: "/dashboard/explore-jobs" },
+    { label: "Saved Jobs", icon: "🔖", href: "/dashboard/saved-jobs" },
     { label: "Interviews", icon: "🎤", href: "/dashboard/interviews" },
     { label: "Candidates", icon: "👥", href: "/dashboard/candidates" },
     { label: "Templates", icon: "📝", href: "/dashboard/templates" },

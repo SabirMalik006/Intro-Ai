@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import { ToastProvider } from "@/components/Toast";
 
 export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -54,7 +55,9 @@ export default function DashboardLayout({ children }) {
             </button>
           )}
 
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </div>
       </main>
 
