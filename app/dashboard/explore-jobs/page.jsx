@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import useJobStore from "@/store/jobStore";
@@ -89,16 +89,16 @@ function FloatingOrb({ size, color, x, y, delay = 0 }) {
   );
 }
 
-function DotGrid() {
+function DotGrid({ opacity = 0.04, id = "dots" }) {
   return (
-    <svg className="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
+    <svg className="absolute inset-0 w-full h-full" style={{ opacity }} xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+        <pattern id={id} x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
           <circle cx="2" cy="2" r="1.5" fill="white" />
           <circle cx="18" cy="18" r="1" fill="white" opacity="0.5" />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#dots)" />
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
     </svg>
   );
 }
@@ -116,6 +116,164 @@ function HeroShape({ className }) {
     </svg>
   );
 }
+
+// ─── BACKGROUND VARIANTS ───
+const BG_VARIANTS = [
+  // 1. Orbs + Icons (current)
+  () => (
+    <>
+      <FloatingOrb size={800} color="bg-indigo-500" x={80} y={-30} delay={0} />
+      <FloatingOrb size={600} color="bg-violet-500" x={-15} y={70} delay={1} />
+      <FloatingOrb size={450} color="bg-indigo-400" x={55} y={80} delay={2} />
+      <DotGrid />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-indigo-400/8 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-violet-400/8 to-transparent rounded-full blur-3xl"></div>
+      <FloatIcon delay={0.5} x={-40} y={-32}><div className="text-5xl opacity-25">💼</div></FloatIcon>
+      <FloatIcon delay={1.2} x={42} y={-28}><div className="text-4xl opacity-20">🚀</div></FloatIcon>
+      <FloatIcon delay={2} x={-38} y={30}><div className="text-4xl opacity-20">⭐</div></FloatIcon>
+      <FloatIcon delay={0.8} x={44} y={34}><div className="text-5xl opacity-25">🎯</div></FloatIcon>
+      <HeroShape className="w-64 h-64 top-[-40px] right-[-50px] opacity-50" />
+      <HeroShape className="w-44 h-44 bottom-[-30px] left-[-30px] opacity-40 rotate-45" />
+      <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="g1" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5" /></pattern></defs>
+        <rect width="100%" height="100%" fill="url(#g1)" />
+      </svg>
+    </>
+  ),
+
+  // 2. Twinkling Stars + Aurora
+  () => {
+    const stars = Array.from({ length: 40 }, (_, i) => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 3 + 1,
+      delay: Math.random() * 3,
+      dur: Math.random() * 2 + 1.5,
+    }));
+    return (
+      <>
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/20 via-transparent to-violet-500/20 blur-3xl"></div>
+        <div className="absolute top-[10%] left-[20%] w-[500px] h-[300px] bg-violet-500/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+        {stars.map((s, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-white"
+            style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }}
+            transition={{ duration: s.dur, repeat: Infinity, delay: s.delay, ease: "easeInOut" }}
+          />
+        ))}
+        <FloatIcon delay={1} x={-35} y={-25}><div className="text-4xl opacity-20">✨</div></FloatIcon>
+        <FloatIcon delay={2.5} x={38} y={-20}><div className="text-3xl opacity-15">🌟</div></FloatIcon>
+      </>
+    );
+  },
+
+  // 3. Wavy Lines + Geometric
+  () => (
+    <>
+      <svg className="absolute inset-0 w-full h-full opacity-[0.12]" viewBox="0 0 1200 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <motion.path d="M0,300 C200,100 400,500 600,300 C800,100 1000,500 1200,300" stroke="url(#w1)" strokeWidth="40" fill="none" opacity="0.3"
+          animate={{ d: ["M0,300 C200,100 400,500 600,300 C800,100 1000,500 1200,300", "M0,200 C200,400 400,100 600,400 C800,100 1000,400 1200,200", "M0,300 C200,100 400,500 600,300 C800,100 1000,500 1200,300"] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.path d="M0,400 C200,600 400,200 600,400 C800,600 1000,200 1200,400" stroke="url(#w2)" strokeWidth="25" fill="none" opacity="0.2"
+          animate={{ d: ["M0,400 C200,600 400,200 600,400 C800,600 1000,200 1200,400", "M0,300 C200,100 400,500 600,300 C800,100 1000,500 1200,300", "M0,400 C200,600 400,200 600,400 C800,600 1000,200 1200,400"] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <defs>
+          <linearGradient id="w1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#6366f1" /><stop offset="100%" stopColor="#8b5cf6" /></linearGradient>
+          <linearGradient id="w2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#a855f7" /><stop offset="100%" stopColor="#6366f1" /></linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute top-[-20px] left-[-20px] w-[200px] h-[200px] border border-indigo-400/20 rounded-3xl rotate-12"></div>
+      <div className="absolute bottom-[10%] right-[5%] w-[150px] h-[150px] border border-violet-400/20 rounded-full"></div>
+      <div className="absolute top-[30%] right-[15%] w-[100px] h-[100px] border border-indigo-400/15 rounded-2xl -rotate-12"></div>
+      <FloatIcon delay={0.5} x={-42} y={-30}><div className="text-4xl opacity-20">📈</div></FloatIcon>
+      <FloatIcon delay={1.5} x={40} y={25}><div className="text-4xl opacity-15">💡</div></FloatIcon>
+    </>
+  ),
+
+  // 4. Diagonal Gradient Bars + Floating Cubes
+  () => (
+    <>
+      <div className="absolute inset-0 overflow-hidden">
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <motion.div
+            key={i}
+            className="absolute h-[200px] w-[800px] bg-gradient-to-r from-indigo-500/5 via-violet-500/8 to-transparent -skew-y-12"
+            style={{ top: `${i * 18 - 10}%`, left: `${i % 2 === 0 ? -10 : -20}%` }}
+            animate={{ x: [0, i % 2 === 0 ? 30 : -30, 0] }}
+            transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+          />
+        ))}
+      </div>
+      {[
+        { x: 10, y: 15, s: 60, r: 15, d: 0 },
+        { x: 85, y: 10, s: 40, r: 25, d: 1 },
+        { x: 75, y: 60, s: 50, r: 10, d: 2 },
+        { x: 15, y: 70, s: 35, r: 20, d: 0.5 },
+      ].map((box, i) => (
+        <motion.div
+          key={`box${i}`}
+          className="absolute border border-indigo-400/20 bg-indigo-400/5 backdrop-blur-sm"
+          style={{ left: `${box.x}%`, top: `${box.y}%`, width: box.s, height: box.s, borderRadius: box.r }}
+          animate={{ y: [0, -15, 0], rotate: [0, box.r, 0] }}
+          transition={{ duration: 5 + box.d, repeat: Infinity, ease: "easeInOut", delay: box.d }}
+        />
+      ))}
+      <FloatIcon delay={0.8} x={-38} y={-28}><div className="text-4xl opacity-20">🏢</div></FloatIcon>
+      <FloatIcon delay={1.8} x={40} y={30}><div className="text-4xl opacity-15">📊</div></FloatIcon>
+    </>
+  ),
+
+  // 5. Circuit / Connected Nodes
+  () => {
+    const nodes = [
+      { x: 10, y: 20 }, { x: 30, y: 15 }, { x: 50, y: 25 }, { x: 70, y: 15 },
+      { x: 85, y: 30 }, { x: 20, y: 55 }, { x: 45, y: 50 }, { x: 65, y: 60 },
+      { x: 80, y: 70 }, { x: 35, y: 80 }, { x: 55, y: 75 }, { x: 15, y: 40 },
+    ];
+    const connections = [
+      [0,1],[1,2],[2,3],[3,4],[5,6],[6,7],[7,8],[9,10],[0,5],[1,6],[2,7],[3,8],[4,8],[5,9],[6,10],[7,11],
+    ];
+    return (
+      <>
+        <svg className="absolute inset-0 w-full h-full opacity-[0.08]" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {connections.map(([a, b], i) => (
+            <motion.line
+              key={i}
+              x1={nodes[a].x} y1={nodes[a].y} x2={nodes[b].x} y2={nodes[b].y}
+              stroke="url(#circuitGrad)" strokeWidth="0.3"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: [0, 1, 0], opacity: [0, 0.8, 0] }}
+              transition={{ duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
+            />
+          ))}
+          <defs>
+            <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#6366f1" /><stop offset="100%" stopColor="#a855f7" />
+            </linearGradient>
+          </defs>
+        </svg>
+        {nodes.map((n, i) => (
+          <motion.div
+            key={`n${i}`}
+            className="absolute w-2 h-2 rounded-full bg-indigo-400/60 shadow-lg shadow-indigo-400/30"
+            style={{ left: `${n.x}%`, top: `${n.y}%` }}
+            animate={{ scale: [0.8, 1.5, 0.8], opacity: [0.3, 0.9, 0.3] }}
+            transition={{ duration: 3, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+          />
+        ))}
+        <div className="absolute top-[5%] right-[10%] w-[300px] h-[300px] bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-transparent rounded-full blur-[80px]"></div>
+        <FloatIcon delay={1} x={-36} y={-22}><div className="text-4xl opacity-20">🔗</div></FloatIcon>
+        <FloatIcon delay={2} x={42} y={28}><div className="text-3xl opacity-15">⚡</div></FloatIcon>
+      </>
+    );
+  },
+];
 
 export default function ExploreJobsPage() {
   const toast = useToast();
@@ -165,49 +323,14 @@ export default function ExploreJobsPage() {
 
   const hasActiveFilters = filters.jobType || filters.experienceLevel;
 
+  const bgIndex = useMemo(() => Math.floor(Math.random() * BG_VARIANTS.length), []);
+  const BgComponent = BG_VARIANTS[bgIndex];
+
   return (
     <div className="min-h-screen pb-20 space-y-8">
       {/* ─── HERO SECTION ─── */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 p-8 lg:p-12 text-white shadow-2xl min-h-[420px] lg:min-h-[460px] flex items-center">
-        {/* Animated background orbs - larger */}
-        <FloatingOrb size={800} color="bg-indigo-500" x={80} y={-30} delay={0} />
-        <FloatingOrb size={600} color="bg-violet-500" x={-15} y={70} delay={1} />
-        <FloatingOrb size={450} color="bg-indigo-400" x={55} y={80} delay={2} />
-
-        {/* Dot grid overlay */}
-        <DotGrid />
-
-        {/* Top-right accent glow - larger */}
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-indigo-400/8 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-violet-400/8 to-transparent rounded-full blur-3xl"></div>
-
-        {/* Floating decorative elements - larger icons, wider spread */}
-        <FloatIcon delay={0.5} x={-40} y={-32}>
-          <div className="text-5xl opacity-25">💼</div>
-        </FloatIcon>
-        <FloatIcon delay={1.2} x={42} y={-28}>
-          <div className="text-4xl opacity-20">🚀</div>
-        </FloatIcon>
-        <FloatIcon delay={2} x={-38} y={30}>
-          <div className="text-4xl opacity-20">⭐</div>
-        </FloatIcon>
-        <FloatIcon delay={0.8} x={44} y={34}>
-          <div className="text-5xl opacity-25">🎯</div>
-        </FloatIcon>
-
-        {/* Decorative SVG shapes - larger */}
-        <HeroShape className="w-64 h-64 top-[-40px] right-[-50px] opacity-50" />
-        <HeroShape className="w-44 h-44 bottom-[-30px] left-[-30px] opacity-40 rotate-45" />
-
-        {/* Subtle grid lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
+        <BgComponent />
 
         <div className="relative z-10 w-full">
           <motion.div
