@@ -500,8 +500,8 @@ function JobCard({ job, index, onDelete, onEdit, onUpdateApplicationStatus, onVi
                     </div>
                     
                     <button
-                      onClick={() => onAssignInterview(job._id, app.candidate || app._id, app)}
-                      disabled={assigningId === (app.candidate || app._id)}
+                      onClick={() => onAssignInterview(job._id, app.candidate?._id || app.candidate || app._id, app)}
+                      disabled={assigningId === (app.candidate?._id || app.candidate || app._id)}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all disabled:opacity-50"
                       title="Assign AI Interview"
                     >
@@ -846,7 +846,7 @@ export default function RecruiterDashboard() {
               handleUpdateApplicationStatus(selectedApplicant.jobId || selectedApplicant.job, appId, { status: newStatus });
               setSelectedApplicant(prev => ({ ...prev, status: newStatus }));
             }}
-            onAssignInterview={(appId) => handleAssignInterview(selectedApplicant.jobId || selectedApplicant.job, appId, selectedApplicant)}
+            onAssignInterview={(appId) => handleAssignInterview(selectedApplicant.jobId || selectedApplicant.job, (selectedApplicant.candidate?._id || selectedApplicant.candidate || appId), selectedApplicant)}
             interviewReport={interviewReports[selectedApplicant?._id]}
           />
         )}

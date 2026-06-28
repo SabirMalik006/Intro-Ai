@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from '@/services/api';
 
@@ -43,6 +43,9 @@ export default function InterviewRoom() {
   const [showSetup, setShowSetup] = useState(true);
   const [interviewPhase, setInterviewPhase] = useState("setup"); // setup | answering | evaluating | report
 
+  const searchParams = useSearchParams();
+  const assignmentId = searchParams.get('assignment');
+
   const aiCharacters = [
     { name: "Sarah", role: "Senior Recruiter", img: "/ai-1.png" },
     { name: "James", role: "Technical Lead", img: "/ai-2.png" },
@@ -54,6 +57,83 @@ export default function InterviewRoom() {
     const randomAi = aiCharacters[Math.floor(Math.random() * aiCharacters.length)];
     setSelectedAi(randomAi);
   }, []);
+
+  // ─── ASSIGNMENT-BASED INTERVIEW ───
+  useEffect(() => {
+    if (!assignmentId) return;
+
+    const initAssignment = async () => {
+      setIsLoadingAI(true);
+      setAiStatusText("Loading your interview...");
+      try {
+        // Fetch current interview state
+        const fetchRes = await api.get(`/interviews/${assignmentId}`);
+        const interview = fetchRes.data.data.interview;
+
+        if (interview.status === 'pending') {
+          // Start the interview
+          await api.put(`/interviews/${assignmentId}/start`);
+        } else if (interview.status !== 'in-progress') {
+          throw new Error('Interview cannot be started from current state');
+        }
+
+        setJobRole(interview.jobRole);
+        setQuestions(interview.questions);
+
+        // Restore previous answers if any
+        if (interview.answers?.length > 0) {
+          const restoredEvals = interview.answers.map(a => ({
+            question: a.question,
+            answer: a.answer,
+            score: a.score,
+            feedback: a.feedback,
+            strength: a.strength,
+            improvement: a.improvement,
+          }));
+          setEvaluations(restoredEvals);
+          setCurrentQuestion(interview.answers.length);
+          // Don't restore the last answer text since it's already submitted
+        }
+
+        setInterviewStarted(true);
+        setIsCameraOn(true);
+        setIsPaused(false);
+        setIsRecording(true);
+        setShowSetup(false);
+        setInterviewPhase("answering");
+
+        const qIdx = interview.answers?.length || 0;
+        const firstQ = interview.questions[qIdx]?.question || '';
+        setChatMessages([{
+          sender: "ai",
+          text: `Welcome back! I'm ${selectedAi.name}, your AI interviewer for the ${interview.jobRole} position. ${firstQ ? `Let's continue with the next question.\n\n${firstQ}` : 'All questions have been answered. Let me generate your final report.'}`,
+          time: new Date().toLocaleTimeString()
+        }]);
+        if (firstQ) speakText(`Welcome back! ${firstQ}`);
+
+        // If all questions already answered, skip to report
+        if (qIdx >= (interview.questions?.length || 0)) {
+          setIsInterviewComplete(true);
+          setIsPaused(true);
+          setIsRecording(false);
+          if (interview.report) {
+            setInterviewReport(interview.report);
+            setInterviewPhase("report");
+          } else {
+            setInterviewPhase("evaluating");
+            generateFinalReport();
+          }
+        }
+      } catch (err) {
+        console.error('Failed to start assigned interview:', err);
+        setAiStatusText("Failed to load interview. Please try again.");
+      } finally {
+        setIsLoadingAI(false);
+        setAiStatusText("");
+      }
+    };
+    initAssignment();
+  }, [assignmentId]);
 
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
@@ -183,46 +263,58 @@ export default function InterviewRoom() {
     setIsLoadingAI(true);
     setAiStatusText("AI is evaluating your answer...");
 
-    try {
-      const evalRes = await api.post('/ai/interview/evaluate-answer', {
-        question: questionObj.question,
-        answer: trimmed,
-        questionNumber: currentQuestion + 1,
-        totalQuestions: questions.length,
-      });
-
-      if (evalRes.data.success) {
-        const evaluation = evalRes.data.data;
-        setEvaluations(prev => [...prev, {
+    const submitAnswer = async () => {
+      if (assignmentId) {
+        // Assignment mode — use backend /interviews/:id/answer
+        const res = await api.put(`/interviews/${assignmentId}/answer`, {
+          questionId: questionObj.id || (currentQuestion + 1),
+          answer: trimmed,
+        });
+        return res.data.data.evaluation;
+      } else {
+        // Self-practice mode — use old /ai/interview/evaluate-answer
+        const evalRes = await api.post('/ai/interview/evaluate-answer', {
           question: questionObj.question,
           answer: trimmed,
-          ...evaluation,
-        }]);
+          questionNumber: currentQuestion + 1,
+          totalQuestions: questions.length,
+        });
+        if (evalRes.data.success) return evalRes.data.data;
+        throw new Error('Evaluation failed');
+      }
+    };
 
-        setChatMessages(prev => [
-          ...prev,
-          { sender: "ai", text: `Good answer! Score: ${evaluation.score}/100. ${evaluation.feedback}`, time: new Date().toLocaleTimeString() }
-        ]);
+    try {
+      const evaluation = await submitAnswer();
+      setEvaluations(prev => [...prev, {
+        question: questionObj.question,
+        answer: trimmed,
+        ...evaluation,
+      }]);
 
-        if (currentQuestion < questions.length - 1) {
-          const nextIdx = currentQuestion + 1;
-          setCurrentQuestion(nextIdx);
-          setCurrentAnswer("");
-          const nextQ = questions[nextIdx].question;
-          setTimeout(() => {
-            setChatMessages(prev => [
-              ...prev,
-              { sender: "ai", text: nextQ, time: new Date().toLocaleTimeString() }
-            ]);
-            speakText(nextQ);
-          }, 1500);
-        } else {
-          setIsInterviewComplete(true);
-          setIsPaused(true);
-          setIsRecording(false);
-          setInterviewPhase("evaluating");
-          generateFinalReport();
-        }
+      setChatMessages(prev => [
+        ...prev,
+        { sender: "ai", text: `Good answer! Score: ${evaluation.score || evaluation.evaluation?.score}/100. ${evaluation.feedback || evaluation.evaluation?.feedback}`, time: new Date().toLocaleTimeString() }
+      ]);
+
+      if (currentQuestion < questions.length - 1) {
+        const nextIdx = currentQuestion + 1;
+        setCurrentQuestion(nextIdx);
+        setCurrentAnswer("");
+        const nextQ = questions[nextIdx].question;
+        setTimeout(() => {
+          setChatMessages(prev => [
+            ...prev,
+            { sender: "ai", text: nextQ, time: new Date().toLocaleTimeString() }
+          ]);
+          speakText(nextQ);
+        }, 1500);
+      } else {
+        setIsInterviewComplete(true);
+        setIsPaused(true);
+        setIsRecording(false);
+        setInterviewPhase("evaluating");
+        generateFinalReport();
       }
     } catch (error) {
       console.error("Evaluation error:", error);
@@ -261,25 +353,40 @@ export default function InterviewRoom() {
     setAiStatusText("AI is generating your interview report...");
 
     try {
-      const response = await api.post('/ai/interview/generate-report', {
-        answers: evaluations,
-        jobRole: jobRole.trim(),
-      });
-
-      if (response.data.success) {
-        setInterviewReport(response.data.data);
+      if (assignmentId) {
+        // Assignment mode — complete via backend
+        const res = await api.put(`/interviews/${assignmentId}/complete`);
+        const report = res.data.data.report;
+        setInterviewReport(report);
         setInterviewPhase("report");
-        const reportMsg = `Thank you for completing the interview! Your overall score is ${response.data.data.overallScore}%.`;
+        const reportMsg = `Thank you for completing the interview! Your overall score is ${report.overallScore}%.`;
         setChatMessages(prev => [
           ...prev,
           { sender: "ai", text: reportMsg, time: new Date().toLocaleTimeString() }
         ]);
         speakText(reportMsg);
+      } else {
+        // Self-practice mode
+        const response = await api.post('/ai/interview/generate-report', {
+          answers: evaluations,
+          jobRole: jobRole.trim(),
+        });
+        if (response.data.success) {
+          setInterviewReport(response.data.data);
+          setInterviewPhase("report");
+          const reportMsg = `Thank you for completing the interview! Your overall score is ${response.data.data.overallScore}%.`;
+          setChatMessages(prev => [
+            ...prev,
+            { sender: "ai", text: reportMsg, time: new Date().toLocaleTimeString() }
+          ]);
+          speakText(reportMsg);
+        }
       }
     } catch (error) {
       console.error("Report generation error:", error);
+      const fallbackScore = Math.round(evaluations.reduce((s, e) => s + e.score, 0) / evaluations.length);
       setInterviewReport({
-        overallScore: Math.round(evaluations.reduce((s, e) => s + e.score, 0) / evaluations.length),
+        overallScore: fallbackScore,
         strengths: ["Completed all questions", "Good participation"],
         areasForImprovement: ["Provide more detailed answers"],
         summary: "Interview completed. Thank you for your time.",

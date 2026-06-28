@@ -235,6 +235,19 @@ const useJobStore = create((set, get) => ({
     }
   },
 
+  deleteInterview: async (id) => {
+    try {
+      await api.delete(`/interviews/${id}`);
+      // Remove from local lists
+      set((state) => ({
+        assignedInterviews: state.assignedInterviews.filter(i => i._id !== id),
+      }));
+      return { success: true, message: 'Interview deleted successfully' };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to delete interview' };
+    }
+  },
+
   clearError: () => set({ error: null }),
 }));
 
