@@ -11,10 +11,19 @@ const recruiterOnlyPaths = ['/dashboard/candidates', '/dashboard/recruiter', '/d
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, fetchMe, loading } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [authorized, setAuthorized] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  useEffect(() => {
+    if (!user && initialLoad) {
+      fetchMe().finally(() => setInitialLoad(false));
+    } else if (user) {
+      setInitialLoad(false);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {

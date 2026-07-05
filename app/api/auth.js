@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const BACKEND_URL = API_URL.replace('/api/v1', '');
 
 export async function registerUser(userData) {
   const response = await fetch(`${API_URL}/auth/register`, {
@@ -74,4 +75,12 @@ export function getStoredUser() {
 
 export function isLoggedIn() {
   return !!getStoredUser();
+}
+
+export function getGoogleAuthUrl() {
+  return `${BACKEND_URL}/api/v1/auth/google`;
+}
+
+export function loginWithGoogle() {
+  window.location.href = getGoogleAuthUrl();
 }

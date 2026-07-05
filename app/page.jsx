@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import createGlobe from "cobe";
-import { isLoggedIn } from "./api/auth";
+import { isLoggedIn, logoutUser } from "./api/auth";
 
 // ─────────────────────────────────────────────
 // GLOBAL STYLES
@@ -522,6 +522,17 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navLinks = ["Features", "How It Works", "Pricing", "Testimonials"];
 
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      localStorage.removeItem('user');
+    }
+    setLoggedIn(false);
+    setMenuOpen(false);
+    window.location.href = '/login';
+  };
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handler);
@@ -551,8 +562,8 @@ function Navbar() {
     }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 3vw, 40px)", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: "#c8f135", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚡</div>
-          <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--surface)" }}>SmartHire</span>
+          <img src="/Gemini_Generated_Image_dqsy35dqsy35dqsy.png" alt="SmartHire" style={{ width: 42, height: 42, borderRadius: 10, objectFit: "cover" }} />
+          <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: "var(--surface)" }}>SmartHire</span>
         </a>
 
         <div className="hide-mobile" style={{ display: "flex", gap: 36 }}>
@@ -562,10 +573,27 @@ function Navbar() {
         </div>
 
         <div className="hide-mobile" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          {!loggedIn && (
-            <a href="/login" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px" }}>Sign in</a>
+          {!loggedIn ? (
+            <>
+              <a href="/login" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px" }}>Sign in</a>
+              <a href="/register" className="btn-primary" style={{ padding: "10px 24px", fontSize: 14 }}>Get Started</a>
+            </>
+          ) : (
+            <>
+              <a href="/dashboard" style={{ color: "rgba(240,239,232,0.6)", fontWeight: 500, fontSize: 14, textDecoration: "none", padding: "8px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Dashboard
+              </a>
+              <button onClick={handleLogout} className="btn-primary" style={{ padding: "10px 24px", fontSize: 14, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+              </button>
+            </>
           )}
-          <a href="/dashboard" className="btn-primary" style={{ padding: "10px 24px", fontSize: 14 }}>Get Started</a>
         </div>
 
         <button
@@ -666,38 +694,88 @@ function Navbar() {
             </a>
           ))}
 
-          {!loggedIn && (
-            <a
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              style={{
-                color: "rgba(240,239,232,0.8)",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 500,
-                padding: "12px 4px 4px",
-                width: "100%",
-              }}
-            >
-              Sign in
-            </a>
+          {!loggedIn ? (
+            <>
+              <a
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  color: "rgba(240,239,232,0.8)",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: "12px 4px 4px",
+                  width: "100%",
+                }}
+              >
+                Sign in
+              </a>
+              <a
+                href="/register"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  textDecoration: "none",
+                  background: "#c8f135",
+                  color: "#0a0a0f",
+                  fontWeight: 700,
+                  borderRadius: 999,
+                  padding: "10px 18px",
+                  marginTop: 4,
+                }}
+              >
+                Get Started
+              </a>
+            </>
+          ) : (
+            <>
+              <a
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  color: "#c8f135",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: "12px 4px 4px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Dashboard
+              </a>
+              <button
+                onClick={() => { handleLogout(); }}
+                style={{
+                  textDecoration: "none",
+                  background: "rgba(255,255,255,0.06)",
+                  color: "#f87171",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  borderRadius: 999,
+                  padding: "10px 18px",
+                  marginTop: 4,
+                  border: "1px solid rgba(248,113,113,0.2)",
+                  cursor: "pointer",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Logout
+              </button>
+            </>
           )}
-
-          <a
-            href="/dashboard"
-            onClick={() => setMenuOpen(false)}
-            style={{
-              textDecoration: "none",
-              background: "#c8f135",
-              color: "#0a0a0f",
-              fontWeight: 700,
-              borderRadius: 999,
-              padding: "10px 18px",
-              marginTop: 4,
-            }}
-          >
-            Get Started
-          </a>
         </div>
       </motion.div>
     </nav>
@@ -2511,8 +2589,8 @@ function Footer() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", marginBottom: 48 }}>
           <div style={{ maxWidth: 280 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: "#c8f135", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚡</div>
-              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: "var(--surface)" }}>SmartHire</span>
+              <img src="/Gemini_Generated_Image_dqsy35dqsy35dqsy.png" alt="SmartHire" style={{ width: 42, height: 42, borderRadius: 10, objectFit: "cover" }} />
+              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: "var(--surface)" }}>SmartHire</span>
             </div>
             <p style={{ color: "#8a8a96", fontSize: 14, lineHeight: 1.7 }}>AI-powered hiring platform that helps modern teams find exceptional talent faster and smarter.</p>
           </div>
