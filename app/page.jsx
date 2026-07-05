@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import createGlobe from "cobe";
 import { isLoggedIn, logoutUser } from "./api/auth";
+import { SplineScene } from "../components/ui/SplineScene";
+import { useToast } from "@/components/Toast";
 
 // ─────────────────────────────────────────────
 // GLOBAL STYLES
@@ -23,6 +26,10 @@ const GlobalStyles = () => (
       --blue-light: #6b7fff;
       --warm: #ff6b35;
       --muted: #8a8a96;
+      --color-1: #c8f135;
+      --color-2: #7bf1a8;
+      --color-3: #6b7fff;
+      --color-4: #ff6b35;
     }
 
     html { scroll-behavior: smooth; }
@@ -210,11 +217,6 @@ const GlobalStyles = () => (
       perspective: 1200;
     }
 
-    .cta-cube-shell {
-      width: min(560px, 100%);
-      margin-right: -52px;
-    }
-
     /* Globe container */
     .globe-wrapper {
       position: relative;
@@ -281,10 +283,6 @@ const GlobalStyles = () => (
         justify-content: center !important;
       }
 
-      .cta-cube-shell {
-        margin-right: 0 !important;
-        width: min(460px, 100%) !important;
-      }
     }
 
     @media (max-width: 480px) {
@@ -292,12 +290,6 @@ const GlobalStyles = () => (
       .hero-globe-col {
         width: 100%;
         max-width: 320px;
-        // margin-bottom: 0px;
-        // background-color : red;
-      }
-
-      .cta-cube-shell {
-        width: min(340px, 100%) !important;
       }
     }
 
@@ -521,10 +513,12 @@ function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navLinks = ["Features", "How It Works", "Pricing", "Testimonials"];
+  const toast = useToast();
 
   const handleLogout = async () => {
     try {
       await logoutUser();
+      toast('Logged out successfully', 'success');
     } catch {
       localStorage.removeItem('user');
     }
@@ -786,6 +780,7 @@ function Navbar() {
 // HERO SECTION
 // ─────────────────────────────────────────────
 function Hero() {
+  const router = useRouter();
   const stats = [
     { n: "5,000+", l: "Interviews Conducted" },
     { n: "9/10", l: "Candidate Satisfaction" },
@@ -856,14 +851,14 @@ function Hero() {
 
             {/* CTA buttons */}
             <div className="anim-fade-up d400 hero-cta-btns" style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 60 }}>
-              <a href="/register" className="btn-primary">
-                Start Free Trial
+              <button onClick={() => router.push(isLoggedIn() ? '/dashboard/interview-room' : '/login')} className="btn-primary">
+                Start AI Interview
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-              </a>
-              <a href="#demo" className="btn-ghost">
+              </button>
+              <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Watch Demo
-              </a>
+                See How It Works
+              </button>
             </div>
 
             {/* Stats */}
@@ -1663,13 +1658,13 @@ function HowItWorks() {
           transform: statsVisible ? "translateY(0)" : "translateY(16px)",
           transition:"opacity 0.9s cubic-bezier(0.22,1,0.36,1) 0.45s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.45s",
         }}>
-          <p style={{ color:"rgba(240,239,232,0.28)", fontSize:"clamp(0.77rem,1.7vw,0.9rem)", fontFamily:"'DM Sans',sans-serif" }}>
-            Join 2,400+ companies already hiring smarter
-          </p>
-          <div style={{ display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
-            <button className="cta-primary">Start Hiring Free →</button>
-            <button className="cta-ghost">Watch Demo</button>
-          </div>
+            <p style={{ color:"rgba(240,239,232,0.28)", fontSize:"clamp(0.77rem,1.7vw,0.9rem)", fontFamily:"'DM Sans',sans-serif" }}>
+              Join 2,400+ companies already hiring smarter
+            </p>
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
+              <button onClick={() => router.push(isLoggedIn() ? '/dashboard/interview-room' : '/login')} className="cta-primary">Start AI Interview →</button>
+              <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="cta-ghost">See How It Works</button>
+            </div>
         </div>
       </div>
     </section>
@@ -2469,44 +2464,8 @@ function Pricing() {
 // CTA
 // ─────────────────────────────────────────────
 function CTA() {
-  const [cubeTilt, setCubeTilt] = useState({ x: -6, y: 8 });
-  const [isDraggingCube, setIsDraggingCube] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const startTiltRef = useRef({ x: -6, y: 8 });
-
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-
-  const onCubePointerDown = (e) => {
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-    startTiltRef.current = { ...cubeTilt };
-    setIsDraggingCube(true);
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-  };
-
-  const onCubePointerMove = (e) => {
-    if (!isDraggingCube) return;
-    const dx = e.clientX - dragStartRef.current.x;
-    const dy = e.clientY - dragStartRef.current.y;
-    setCubeTilt({
-      x: clamp(startTiltRef.current.x - dy * 0.08, -18, 18),
-      y: clamp(startTiltRef.current.y + dx * 0.08, -25, 25),
-    });
-  };
-
-  const onCubePointerUp = (e) => {
-    if (!isDraggingCube) return;
-    setIsDraggingCube(false);
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-  };
-
-  const onCubePointerLeave = () => {
-    if (!isDraggingCube) {
-      setCubeTilt({ x: -6, y: 8 });
-    }
-  };
-
   return (
-    <section style={{ padding: "120px 0", position: "relative", overflow: "hidden", background: "transparent" }}>
+    <section style={{ padding: "30px 0", position: "relative", overflow: "hidden", background: "transparent" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 1 }}>
         <div className="reveal" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 32, alignItems: "center" }}>
           <div style={{ textAlign: "left" }}>
@@ -2527,43 +2486,22 @@ function CTA() {
             <p style={{ color: "#8a8a96", fontSize: 13 }}>No credit card required · Cancel anytime · 24/7 Support</p>
           </div>
 
-          <div className="cta-visual-col">
-            <div className="cta-cube-shell" style={{
-              borderRadius: 24,
-              overflow: "hidden",
-              border: "none",
-              boxShadow: "none",
-              background: "transparent",
-              transformOrigin: "center",
-              transform: `rotateX(${cubeTilt.x}deg) rotateY(${cubeTilt.y}deg)`,
-              transition: isDraggingCube ? "transform 70ms linear" : "transform 350ms cubic-bezier(0.16,1,0.3,1)",
-              willChange: "transform",
-              cursor: isDraggingCube ? "grabbing" : "grab",
-            }}>
-              <video
-                src="/cube.webm"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                onPointerDown={onCubePointerDown}
-                onPointerMove={onCubePointerMove}
-                onPointerUp={onCubePointerUp}
-                onPointerCancel={onCubePointerUp}
-                onPointerLeave={onCubePointerLeave}
-                style={{
-                  width: "100%",
-                  display: "block",
-                  objectFit: "contain",
-                  background: "transparent",
-                  mixBlendMode: "lighten",
-                  touchAction: "none",
-                  userSelect: "none",
-                  imageRendering: "auto",
-                  backfaceVisibility: "hidden",
-                  transform: "translateZ(0)",
-                }}
+          <div className="cta-visual-col" style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", position: "relative", paddingRight: 1 }}>
+            <div style={{
+              position: "absolute",
+              width: 760,
+              height: 650,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
+            <div style={{ width: "100%", maxWidth: 640, height: 560, borderRadius: 24, overflow: "hidden", background: "transparent", position: "relative" }}>
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
               />
             </div>
           </div>

@@ -42,6 +42,7 @@ export default function InterviewRoom() {
   const [answerError, setAnswerError] = useState("");
   const [showSetup, setShowSetup] = useState(true);
   const [interviewPhase, setInterviewPhase] = useState("setup"); // setup | answering | evaluating | report
+  const [isAiMuted, setIsAiMuted] = useState(false);
 
   const searchParams = useSearchParams();
   const assignmentId = searchParams.get('assignment');
@@ -143,22 +144,30 @@ export default function InterviewRoom() {
   const [chatMessages, setChatMessages] = useState([]);
 
   const speakText = (text) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (!('speechSynthesis' in window) || isAiMuted) return;
+    window.speechSynthesis.cancel();
+
+    const speak = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
-
       const preferredVoice = voices.find(v =>
         v.lang.startsWith('en') &&
         (selectedAi.name === 'Sarah' ? (v.name.includes('Female') || v.gender === 'female') : (v.name.includes('Male') || v.gender === 'male'))
       ) || voices[0];
-
       if (preferredVoice) utterance.voice = preferredVoice;
-
       utterance.onstart = () => setAiSpeaking(true);
       utterance.onend = () => setAiSpeaking(false);
-
       window.speechSynthesis.speak(utterance);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      speak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        speak();
+      };
     }
   };
 
@@ -207,6 +216,24 @@ export default function InterviewRoom() {
 
   const startInterviewSession = async () => {
     if (!jobRole.trim()) return;
+
+    // Warm up speech synthesis in user gesture
+    if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+    }
+
+    // Request camera permission in user gesture (test stream, stop immediately)
+    try {
+      const testStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+        audio: false
+      });
+      testStream.getTracks().forEach(t => t.stop());
+    } catch (err) {
+      console.error("Camera permission denied:", err);
+    }
 
     setIsLoadingAI(true);
     setAiStatusText("AI is preparing your interview questions...");
@@ -798,6 +825,22 @@ export default function InterviewRoom() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
+            </button>
+
+            <button onClick={() => { setIsAiMuted(!isAiMuted); if (!isAiMuted && 'speechSynthesis' in window) window.speechSynthesis.cancel(); }} className={`p-3 md:p-4 rounded-2xl transition-all active:scale-90 ${isAiMuted ? 'bg-red-500/20 text-red-400' : 'bg-white/5 hover:bg-white/10 text-white'}`} title={isAiMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}>
+              {isAiMuted ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M19.07 4.93a10 10 0 010 14.14" />
+                  <path d="M15.54 8.46a5 5 0 010 7.07" />
+                </svg>
+              )}
             </button>
 
             <div className="w-px h-8 bg-white/10" />

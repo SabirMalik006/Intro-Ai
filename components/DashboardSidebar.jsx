@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useAuthStore from "../store/authStore";
+import { useToast } from "../components/Toast";
+import { logoutUser } from "../app/api/auth";
 
 const icons = {
   Dashboard: { outline: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6", solid: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
@@ -11,7 +13,6 @@ const icons = {
   "Saved Jobs": { outline: "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z", solid: "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" },
   Interviews: { outline: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z", solid: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" },
   Candidates: { outline: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z", solid: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
-  Templates: { outline: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", solid: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
   Analytics: { outline: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", solid: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
   Reports: { outline: "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", solid: "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
   Messages: { outline: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z", solid: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
@@ -27,7 +28,7 @@ const menuGroups = [
   },
   {
     label: "Management",
-    items: ["Candidates", "Templates", "Analytics", "Reports"],
+    items: ["Candidates", "Analytics", "Reports"],
   },
   {
     label: "Tools",
@@ -37,8 +38,9 @@ const menuGroups = [
 
 export default function DashboardSidebar({ open, toggle, isMobile }) {
   const pathname = usePathname();
-  const [theme, setTheme] = useState("light");
   const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState("dark");
+  const toast = useToast();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -61,7 +63,6 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
     { label: "Saved Jobs", href: "/dashboard/saved-jobs", recruiterOnly: false },
     { label: "Interviews", href: "/dashboard/interviews", recruiterOnly: false },
     { label: "Candidates", href: "/dashboard/candidates", recruiterOnly: true },
-    { label: "Templates", href: "/dashboard/templates", recruiterOnly: false },
     { label: "Analytics", href: "/dashboard/analytics", recruiterOnly: false },
     { label: "Reports", href: "/dashboard/reports", recruiterOnly: false },
     { label: "Messages", href: "/dashboard/messages", recruiterOnly: false },
@@ -113,9 +114,9 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       ${!open && isMobile ? "-translate-x-full shadow-none" : "translate-x-0"}
     `}>
       {/* Logo Section */}
-      <div className={`h-[68px] flex items-center border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 ${open ? "justify-between px-5" : "justify-center px-3"}`}>
-        <Link href="/" className={`flex items-center ${open ? "gap-2.5" : "justify-center"}`}>
-          <img src="/Gemini_Generated_Image_dqsy35dqsy35dqsy.png" alt="SmartHire" className="w-11 h-11 rounded-xl object-cover ring-1 ring-white/20 dark:ring-white/5" />
+      <div className={`h-[68px] flex items-center border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 ${open ? "justify-between px-5" : "justify-between px-2"}`}>
+        <Link href="/" className={`flex items-center ${open ? "gap-2.5" : "gap-0"}`}>
+          <img src="/Gemini_Generated_Image_dqsy35dqsy35dqsy.png" alt="SmartHire" className={`rounded-xl object-cover ring-1 ring-white/20 dark:ring-white/5 ${open ? "w-11 h-11" : "w-8 h-8"}`} />
           {open && (
             <div>
               <h2 className="text-base font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400">
@@ -127,16 +128,10 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
         </Link>
 
         {!isMobile && (
-          <button onClick={toggle} className="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-500 dark:hover:text-slate-300 transition-all duration-200">
-            {open ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 19l-7-7 7-7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 5l7 7-7 7" />
-              </svg>
-            )}
+          <button onClick={toggle} className={`${open ? "p-1.5 rounded-lg" : "p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"} text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-300 transition-all duration-200`}>
+            <svg className={`${open ? "w-4 h-4" : "w-3.5 h-3.5"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {open ? <path d="M15 19l-7-7 7-7" /> : <path d="M9 5l7 7-7 7" />}
+            </svg>
           </button>
         )}
       </div>
@@ -248,7 +243,11 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
         </div>
 
         {/* Logout */}
-        <button onClick={() => useAuthStore.getState().logout()} className={`
+        <button onClick={async () => {
+          try { await logoutUser(); } catch {}
+          toast?.('Logged out successfully', 'success');
+          useAuthStore.getState().logout();
+        }} className={`
           w-full rounded-xl border border-red-100 dark:border-red-900/20
           bg-white dark:bg-red-950/10
           text-sm font-medium text-red-600 dark:text-red-400

@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerUser, loginWithGoogle } from "../api/auth";
+import { useToast } from "@/components/Toast";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const toast = useToast();
   const [userType, setUserType] = useState("recruiter");
   const [formData, setFormData] = useState({
     fullName: "",
@@ -54,12 +56,11 @@ export default function RegisterPage() {
 
       const response = await registerUser(userData);
       
-      console.log("Registration successful:", response);
+      toast('Account created successfully! Please log in.', 'success');
       
-      // ✅ Redirect to LOGIN page (not dashboard)
-      router.push("/login?registered=true");
+      router.push("/login");
     } catch (error) {
-      console.error("Registration error:", error);
+      toast(error.message || 'Registration failed', 'error');
       setErrors({ general: error.message });
     } finally {
       setLoading(false);

@@ -1,25 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import useAuthStore from "@/store/authStore";
-import { ToastProvider } from "@/components/Toast";
+import { ToastProvider, useToast } from "@/components/Toast";
 
 const recruiterOnlyPaths = ['/dashboard/candidates', '/dashboard/recruiter', '/dashboard/candidate'];
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+  const toast = useToast();
   const { user, fetchMe, loading } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const welcomed = useRef(false);
 
   useEffect(() => {
-    if (!user && initialLoad) {
-      fetchMe().finally(() => setInitialLoad(false));
+    if ((!user && initialLoad) || (!user && !initialLoad)) {
+      fetchMe().then((res) => {
+        if (res.success && !welcomed.current) {
+          welcomed.current = true;
+          const name = res.user?.fullName || 'there';
+          toast(`Welcome, ${name}!`, 'success');
+        }
+      }).finally(() => setInitialLoad(false));
     } else if (user) {
       setInitialLoad(false);
     }

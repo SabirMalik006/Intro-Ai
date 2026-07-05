@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser, loginWithGoogle } from "../api/auth";
+import { useToast } from "@/components/Toast";
 
 export default function LoginPage() {
   const router = useRouter();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -38,12 +40,11 @@ export default function LoginPage() {
         password: formData.password,
       });
       
-      console.log("Login successful:", response);
+      toast(response.message || 'Welcome back!', 'success');
       
-      // ✅ Redirect to home page
       router.push("/");
     } catch (error) {
-      console.error("Login error:", error);
+      toast(error.message || 'Login failed', 'error');
       setErrors({ general: error.message });
     } finally {
       setLoading(false);
