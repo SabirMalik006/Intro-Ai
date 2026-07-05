@@ -212,7 +212,13 @@ export default function JobDetailsPage({ params }) {
               >
                 <Bookmark className={`w-5 h-5 ${savedJobIds.includes(resolvedParams.id) ? 'fill-indigo-600' : ''} ${bookmarkLoading ? 'animate-pulse' : ''}`} />
               </button>
-              <button className="p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast("Link copied to clipboard!", "success");
+                }}
+                className="p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 hover:text-indigo-600 hover:border-indigo-300 transition-all"
+              >
                 <Share2 className="w-5 h-5" />
               </button>
               <button

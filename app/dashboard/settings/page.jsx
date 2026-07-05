@@ -232,7 +232,7 @@ export default function SettingsPage() {
   const renderIcon = (Icon, active) => (
     <div className={`p-2 rounded-xl transition-all duration-300 ${
       active
-        ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 shadow-sm"
+        ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 shadow-sm"
         : "text-slate-400 group-hover:bg-slate-100 dark:group-hover:bg-slate-800"
     }`}>
       <Icon className="w-4 h-4" />
@@ -242,18 +242,18 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen pb-16">
       {/* ─── HEADER ─── */}
-      <div className="relative mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-6 lg:p-8 text-white shadow-xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-violet-400/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
+      <div className="relative mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 p-6 lg:p-8 text-white shadow-xl">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-400/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
-            <div className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full border border-white/10 text-xs font-semibold text-indigo-200 flex items-center gap-1.5">
+            <div className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full border border-white/10 text-xs font-semibold text-blue-200 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3" />
               Settings
             </div>
           </div>
           <h1 className="text-2xl lg:text-3xl font-extrabold mb-1">Settings</h1>
-          <p className="text-indigo-200 text-sm font-medium">Manage your account, team, and preferences</p>
+          <p className="text-blue-200 text-sm font-medium">Manage your account, team, and preferences</p>
         </div>
       </div>
 
@@ -269,14 +269,14 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap lg:whitespace-normal ${
                     active
-                      ? "bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/30 dark:to-violet-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shadow-sm"
+                      ? "bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent"
                   }`}
                 >
                   {renderIcon(tab.icon, active)}
                   <span>{tab.label}</span>
                   {active && (
-                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 lg:block hidden" />
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 lg:block hidden" />
                   )}
                 </button>
               );
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
                   <div className="p-6 lg:p-8">
                     <div className="flex items-center gap-4 mb-8">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xl font-extrabold shadow-lg shadow-indigo-500/20 shrink-0">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xl font-extrabold shadow-lg shadow-blue-500/20 shrink-0">
                         {avatarInitials}
                       </div>
                       <div>
@@ -315,7 +315,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.fullName}
                           onChange={e => setProfile(p => ({ ...p, fullName: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
                           placeholder="Your full name"
                         />
                       </div>
@@ -327,7 +327,7 @@ export default function SettingsPage() {
                           type="tel"
                           value={profile.phone}
                           onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
                           placeholder="+1 (555) 123-4567"
                         />
                       </div>
@@ -339,7 +339,7 @@ export default function SettingsPage() {
                           rows={3}
                           value={profile.bio}
                           onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400 resize-none"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400 resize-none"
                           placeholder="Tell us about yourself..."
                           maxLength={500}
                         />
@@ -353,7 +353,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.skills}
                           onChange={e => setProfile(p => ({ ...p, skills: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium placeholder-slate-400"
                           placeholder="React, Node.js, MongoDB, TypeScript"
                         />
                         <p className="text-xs text-slate-400 mt-1">Separate skills with commas</p>
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleSaveProfile}
                         disabled={saving}
-                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-extrabold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {saving ? "Saving..." : "Save Changes"}
@@ -403,7 +403,7 @@ export default function SettingsPage() {
                                 type={showPasswords[field.key] ? "text" : "password"}
                                 value={field.value}
                                 onChange={e => field.onChange(e.target.value)}
-                                className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium"
+                                className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium"
                                 placeholder="••••••••"
                               />
                               <button
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                         <button
                           onClick={handleChangePassword}
                           disabled={changingPassword}
-                          className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-extrabold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                           {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
                           {changingPassword ? "Updating..." : "Update Password"}
@@ -517,11 +517,11 @@ export default function SettingsPage() {
                       {notifOptions.map((opt) => (
                         <div
                           key={opt.key}
-                          className="group flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all"
+                          className="group flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all"
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                              notifications[opt.key] ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-600"
+                              notifications[opt.key] ? "bg-blue-500" : "bg-slate-300 dark:bg-slate-600"
                             }`} />
                             <div>
                               <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">{opt.label}</h4>
@@ -532,7 +532,7 @@ export default function SettingsPage() {
                             onClick={() => setNotifications(prev => ({ ...prev, [opt.key]: !prev[opt.key] }))}
                             className={`relative w-12 h-6 rounded-full transition-all duration-300 shrink-0 ${
                               notifications[opt.key]
-                                ? "bg-indigo-500 shadow-sm shadow-indigo-500/30"
+                                ? "bg-blue-500 shadow-sm shadow-blue-500/30"
                                 : "bg-slate-200 dark:bg-slate-700"
                             }`}
                           >
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleSaveNotifications}
                         disabled={saving}
-                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-extrabold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {saving ? "Saving..." : "Save Preferences"}
@@ -582,13 +582,13 @@ export default function SettingsPage() {
                             value={inviteEmail}
                             onChange={e => setInviteEmail(e.target.value)}
                             placeholder="colleague@company.com"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all text-sm font-medium"
                           />
                         </div>
                         <select
                           value={inviteRole}
                           onChange={e => setInviteRole(e.target.value)}
-                          className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all text-sm font-medium"
+                          className="px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm font-medium"
                         >
                           <option value="member">Member</option>
                           <option value="admin">Admin</option>
@@ -596,7 +596,7 @@ export default function SettingsPage() {
                         <button
                           onClick={handleInvite}
                           disabled={inviting || !inviteEmail}
-                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm shrink-0"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-extrabold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed text-sm shrink-0"
                         >
                           {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                           {inviting ? "Sending..." : "Send Invite"}
@@ -609,7 +609,7 @@ export default function SettingsPage() {
                   <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
                     <div className="p-6 lg:p-8">
                       <h3 className="text-lg font-extrabold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-indigo-500" />
+                        <Users className="w-5 h-5 text-blue-500" />
                         Team Members
                       </h3>
 
@@ -630,17 +630,17 @@ export default function SettingsPage() {
                           {team.members.map((member, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all group"
+                              className="flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all group"
                             >
                               <div className="flex items-center gap-4 min-w-0">
-                                <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-extrabold shadow-sm">
+                                <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-sm font-extrabold shadow-sm">
                                   {member.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "??"}
                                 </div>
                                 <div className="min-w-0">
                                   <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                                     {member.user?.fullName || "Unknown"}
                                     {member.user?._id === user?._id && (
-                                      <span className="ml-2 text-[10px] text-indigo-500 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">You</span>
+                                      <span className="ml-2 text-[10px] text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full">You</span>
                                     )}
                                   </p>
                                   <p className="text-xs text-slate-400 truncate">{member.user?.email}</p>
@@ -705,7 +705,7 @@ export default function SettingsPage() {
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => copyInviteLink(invite.token)}
-                                      className="p-2 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all"
+                                      className="p-2 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
                                       title="Copy invite link"
                                     >
                                       <Copy className="w-4 h-4" />
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                   <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
                     <div className="p-6 lg:p-8">
                       <div className="flex items-center gap-4 mb-8">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 shrink-0">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
                           <HelpCircle className="w-6 h-6" />
                         </div>
                         <div>
@@ -766,7 +766,7 @@ export default function SettingsPage() {
                     <div className="p-6 lg:p-8">
                       <div className="flex items-start justify-between gap-6">
                         <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
                             <Mail className="w-6 h-6" />
                           </div>
                           <div>
@@ -776,7 +776,7 @@ export default function SettingsPage() {
                         </div>
                         <a
                           href="mailto:support@smarthire.com"
-                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold rounded-xl hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.97] text-sm shrink-0"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-extrabold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.97] text-sm shrink-0"
                         >
                           <ExternalLink className="w-4 h-4" />
                           Contact Support
