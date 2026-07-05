@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import createGlobe from "cobe";
 import { isLoggedIn, logoutUser } from "./api/auth";
@@ -911,7 +911,7 @@ function Hero() {
 // MARQUEE / LOGO STRIP
 // ─────────────────────────────────────────────
 function LogoMarquee() {
-  const logos = ["Google", "Stripe", "Notion", "Linear", "Figma", "Vercel", "Airbnb", "Shopify", "Atlassian", "Salesforce"];
+  const logos = ["Careem", "Daraz", "Zameen.com", "PakWheels", "Foodpanda", "Bykea", "DevsInc", "Systems Ltd", "VentureDive", "Arbisoft"];
   const doubled = [...logos, ...logos];
 
   return (
@@ -1662,7 +1662,7 @@ function HowItWorks() {
               Join 2,400+ companies already hiring smarter
             </p>
             <div style={{ display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
-              <button onClick={() => router.push(isLoggedIn() ? '/dashboard/interview-room' : '/login')} className="cta-primary">Start AI Interview →</button>
+              <button onClick={() => window.location.href = isLoggedIn() ? '/dashboard/interview-room' : '/login'} className="cta-primary">Start AI Interview →</button>
               <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="cta-ghost">See How It Works</button>
             </div>
         </div>
@@ -1887,28 +1887,22 @@ function Testimonials() {
 const PLANS = [
   { 
     name: "Starter", 
-    price: "$99", 
-    period: "/month", 
-    desc: "Perfect for small teams getting started", 
-    features: ["Up to 10 interviews/month", "Basic AI interviews", "Standard reports", "Email support"],
+    desc: "Perfect for small teams exploring AI recruiting", 
+    features: ["5 AI interviews/month", "Basic resume analysis", "Standard scorecards", "Email support"],
     featured: false,
-    cta: "Start Free Trial"
+    cta: "Get Started Free"
   },
   { 
-    name: "Professional", 
-    price: "$299", 
-    period: "/month", 
-    desc: "Most popular for growing companies", 
-    features: ["Up to 50 interviews/month", "Advanced AI interviews", "Detailed analytics", "Priority support", "Custom templates", "ATS integration"],
+    name: "Growth", 
+    desc: "Most popular option for scaling teams", 
+    features: ["50 AI interviews/month", "Advanced resume analyzer", "Custom interview templates", "ATS integration", "Priority support", "Team collaboration"],
     featured: true,
     cta: "Start Free Trial"
   },
   { 
     name: "Enterprise", 
-    price: "Custom", 
-    period: "", 
-    desc: "For large organizations with custom needs", 
-    features: ["Unlimited interviews", "Custom AI models", "Dedicated support", "White-label option", "API access", "Custom training"],
+    desc: "For large organizations with custom hiring needs", 
+    features: ["Unlimited AI interviews", "Dedicated AI model training", "White-label portal", "API & Webhook access", "Dedicated success manager", "Custom integrations"],
     featured: false,
     cta: "Contact Sales"
   },
@@ -2350,12 +2344,12 @@ function Pricing() {
 
       <div className="pricing-container">
         <div className={`pricing-header ${visibleCards.length > 0 ? 'visible' : ''}`}>
-          <div className="pricing-badge">Pricing Plans</div>
+          <div className="pricing-badge">Smart Plans</div>
           <h2 className="pricing-title">
-            Simple, <span className="grad-text">Transparent</span> Pricing
+            Scale Your <span className="grad-text">Hiring</span> Process
           </h2>
           <p className="pricing-subtitle">
-            No hidden fees, no surprises. Choose what fits your hiring needs.
+            Choose the right plan to find and hire top talent faster with AI.
           </p>
         </div>
 
@@ -2477,11 +2471,11 @@ function CTA() {
               Join thousands of companies already making smarter hiring decisions with SmartHire.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 20 }}>
-              <a href="/register" className="btn-primary" style={{ fontSize: 16, padding: "18px 36px" }}>
-                Start Free 14-Day Trial
+              <a href="/dashboard/explore-jobs" className="btn-primary" style={{ fontSize: 16, padding: "18px 36px" }}>
+                Start AI Hiring Now
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
               </a>
-              <a href="/demo" className="btn-ghost" style={{ fontSize: 16, padding: "17px 36px" }}>Schedule a Demo</a>
+              <a href="/login" className="btn-ghost" style={{ fontSize: 16, padding: "17px 36px" }}>Explore Dashboard</a>
             </div>
             <p style={{ color: "#8a8a96", fontSize: 13 }}>No credit card required · Cancel anytime · 24/7 Support</p>
           </div>
@@ -2520,7 +2514,40 @@ const FOOTER_COLS = [
   { title: "Legal",   links: ["Privacy", "Terms", "Cookie Policy"] },
 ];
 
+const ratingLabels = ["Poor", "Fair", "Good", "Great", "Excellent"];
+
 function Footer() {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackType, setFeedbackType] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [name, setName] = useState("");
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackError, setFeedbackError] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  const resetFeedback = () => {
+    setFeedbackType("");
+    setRating(0);
+    setHoverRating(0);
+    setName("");
+    setFeedbackText("");
+    setFeedbackError("");
+    setFeedbackSubmitted(false);
+  };
+
+  const handleSubmitFeedback = () => {
+    setFeedbackError("");
+    if (!feedbackType) { setFeedbackError("Please select a feedback type."); return; }
+    if (rating === 0) { setFeedbackError("Please give a rating."); return; }
+    if (!feedbackText.trim()) { setFeedbackError("Please write your feedback."); return; }
+    setFeedbackSubmitted(true);
+    setTimeout(() => {
+      setFeedbackOpen(false);
+      resetFeedback();
+    }, 1800);
+  };
+
   return (
     <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "60px 24px 40px" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -2532,20 +2559,139 @@ function Footer() {
             </div>
             <p style={{ color: "#8a8a96", fontSize: 14, lineHeight: 1.7 }}>AI-powered hiring platform that helps modern teams find exceptional talent faster and smarter.</p>
           </div>
-          {FOOTER_COLS.map(({ title, links }) => (
-            <div key={title}>
-              <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: "var(--surface)", marginBottom: 16 }}>{title}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {links.map((l) => <a key={l} href="#" className="footer-link">{l}</a>)}
+          {FOOTER_COLS.map(({ title, links }) => {
+            const linkPaths = {
+              "Features": "/#features", "Pricing": "/#pricing", "Changelog": "/changelog", "Roadmap": "/roadmap",
+              "About": "/about", "Blog": "/blog", "Careers": "/careers", "Press": "/press",
+              "Privacy": "/privacy", "Terms": "/terms", "Cookie Policy": "/cookie-policy"
+            };
+            return (
+              <div key={title}>
+                <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: "var(--surface)", marginBottom: 16 }}>{title}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {links.map((l) => <a key={l} href={linkPaths[l] || "#"} className="footer-link">{l}</a>)}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 24, display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between", alignItems: "center" }}>
           <p style={{ color: "#8a8a96", fontSize: 13 }}>© 2026 SmartHire Inc. All rights reserved.</p>
-          <p style={{ color: "#8a8a96", fontSize: 13 }}>Made with ⚡ for the future of hiring</p>
+          <button onClick={() => setFeedbackOpen(true)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 22px", background: "rgba(200,241,53,0.1)", border: "1px solid rgba(200,241,53,0.15)", borderRadius: 50, color: "#c8f135", fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(200,241,53,0.18)"; e.currentTarget.style.borderColor = "rgba(200,241,53,0.3)"; e.currentTarget.style.transform = "scale(1.03)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(200,241,53,0.1)"; e.currentTarget.style.borderColor = "rgba(200,241,53,0.15)"; e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+            Give Feedback
+          </button>
         </div>
       </div>
+
+      {/* FEEDBACK MODAL */}
+      <AnimatePresence>
+        {feedbackOpen && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => { setFeedbackOpen(false); resetFeedback(); }}
+              style={{ position: "absolute", inset: 0, background: "rgba(10,10,15,0.7)", backdropFilter: "blur(8px)" }}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 30 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              style={{ position: "relative", background: "#13131a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 28, padding: "40px 36px", maxWidth: 500, width: "100%", boxShadow: "0 40px 80px rgba(0,0,0,0.5)", maxHeight: "90vh", overflow: "auto" }}
+            >
+              <button onClick={() => { setFeedbackOpen(false); resetFeedback(); }} style={{ position: "absolute", top: 16, right: 16, width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#8a8a96", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#f0efe8"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#8a8a96"; }}
+              >✕</button>
+
+              <div style={{ textAlign: "center", marginBottom: 28 }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(200,241,53,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                  <svg width="22" height="22" fill="none" stroke="#c8f135" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                </div>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: "1.3rem", marginBottom: 6 }}>Share Your Feedback</h3>
+                <p style={{ color: "#8a8a96", fontSize: 14 }}>Help us improve SmartHire with your thoughts.</p>
+              </div>
+
+              {/* Feedback Type */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#8a8a96", marginBottom: 10, letterSpacing: "0.03em", textTransform: "uppercase" }}>Feedback Type</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {["Review", "Bug Report", "Feature Request"].map((type) => (
+                    <button key={type} onClick={() => setFeedbackType(type)} style={{ flex: 1, padding: "10px 12px", borderRadius: 12, border: feedbackType === type ? "1px solid #c8f135" : "1px solid rgba(255,255,255,0.08)", background: feedbackType === type ? "rgba(200,241,53,0.08)" : "rgba(255,255,255,0.03)", color: feedbackType === type ? "#c8f135" : "#8a8a96", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 12, fontWeight: 600, transition: "all 0.2s" }}>{type}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rating */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#8a8a96", marginBottom: 10, letterSpacing: "0.03em", textTransform: "uppercase" }}>Rating</label>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star} onClick={() => setRating(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} style={{ width: 44, height: 44, borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.03)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", fontSize: 22 }}
+                      onMouseEnter={e => { setHoverRating(star); }}
+                    >
+                      <span style={{ filter: star <= (hoverRating || rating) ? "none" : "grayscale(1)", opacity: star <= (hoverRating || rating) ? 1 : 0.3, transition: "all 0.2s" }}>★</span>
+                    </button>
+                  ))}
+                </div>
+                {hoverRating > 0 && <p style={{ color: "#c8f135", fontSize: 12, marginTop: 6, fontWeight: 600 }}>{ratingLabels[hoverRating - 1]}</p>}
+              </div>
+
+              {/* Name */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#8a8a96", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Your Name (optional)</label>
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", color: "#f0efe8", fontFamily: "'DM Sans',sans-serif", fontSize: 14, outline: "none", transition: "border 0.2s" }}
+                  onFocus={e => e.currentTarget.style.borderColor = "rgba(200,241,53,0.3)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
+                />
+              </div>
+
+              {/* Feedback Text */}
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#8a8a96", marginBottom: 6, letterSpacing: "0.03em", textTransform: "uppercase" }}>Your Feedback</label>
+                <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} placeholder="Tell us what you think about SmartHire..." rows={4} style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", color: "#f0efe8", fontFamily: "'DM Sans',sans-serif", fontSize: 14, outline: "none", resize: "vertical", transition: "border 0.2s" }}
+                  onFocus={e => e.currentTarget.style.borderColor = "rgba(200,241,53,0.3)"}
+                  onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
+                />
+              </div>
+
+              {/* Error */}
+              {feedbackError && (
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 16, color: "#f87171", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  {feedbackError}
+                </motion.div>
+              )}
+
+              {/* Submit / Success */}
+              {feedbackSubmitted ? (
+                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "24px 0" }}>
+                  <motion.div initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.1 }} style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #c8f135, #a0c020)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <motion.svg initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.3 }} width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <motion.path d="M5 13l4 4L19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.3 }} />
+                    </motion.svg>
+                  </motion.div>
+                  <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} style={{ color: "#c8f135", fontWeight: 700, fontSize: 18, fontFamily: "'Syne',sans-serif", margin: 0 }}>Thank You!</motion.p>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} style={{ color: "#8a8a96", fontSize: 13, margin: 0 }}>Your feedback helps us improve.</motion.p>
+                </motion.div>
+              ) : (
+                <button onClick={handleSubmitFeedback} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: "linear-gradient(135deg, #c8f135, #b0e020)", color: "#0a0a0f", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 8px 25px rgba(200,241,53,0.2)" }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 12px 35px rgba(200,241,53,0.3)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 8px 25px rgba(200,241,53,0.2)"; }}
+                >
+                  Submit Feedback
+                </button>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </footer>
   );
 }
