@@ -2553,11 +2553,20 @@ function Footer() {
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", marginBottom: 48 }}>
           <div style={{ maxWidth: 280 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <img src="/Gemini_Generated_Image_dqsy35dqsy35dqsy.png" alt="SmartHire" style={{ width: 42, height: 42, borderRadius: 10, objectFit: "cover" }} />
               <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, color: "var(--surface)" }}>SmartHire</span>
             </div>
-            <p style={{ color: "#8a8a96", fontSize: 14, lineHeight: 1.7 }}>AI-powered hiring platform that helps modern teams find exceptional talent faster and smarter.</p>
+            <p style={{ color: "#8a8a96", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>AI-powered hiring platform that helps modern teams find exceptional talent faster and smarter.</p>
+            <div style={{ background: "linear-gradient(135deg, rgba(200,241,53,0.06), rgba(200,241,53,0.01))", border: "1px solid rgba(200,241,53,0.1)", borderRadius: 16, padding: 16, display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, overflow: "hidden", flexShrink: 0, border: "2px solid rgba(200,241,53,0.2)" }}>
+                <img src="/sabirr.jpeg" alt="Muhammad Sabir Amir" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+              <div>
+                <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 13, color: "var(--surface)", margin: 0 }}>Muhammad Sabir Amir</p>
+                <p style={{ color: "#c8f135", fontSize: 11, fontWeight: 600, margin: "2px 0 0 0" }}>Group Leader & Lead Developer</p>
+              </div>
+            </div>
           </div>
           {FOOTER_COLS.map(({ title, links }) => {
             const linkPaths = {
