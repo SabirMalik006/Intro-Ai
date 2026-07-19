@@ -191,9 +191,9 @@ export default function LoginPage() {
                   <label className="block text-sm font-medium text-gray-300">
                     Password
                   </label>
-                  <a href="#" className="text-sm text-teal-400 hover:text-teal-300 font-medium">
+                  <Link href="/forgot-password" className="text-sm text-teal-400 hover:text-teal-300 font-medium">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <input
                   type="password"

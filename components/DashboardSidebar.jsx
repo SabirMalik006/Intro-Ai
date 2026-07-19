@@ -110,7 +110,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       flex flex-col h-full bg-white dark:bg-slate-900/95 border-r border-slate-200/70 dark:border-slate-700/50
       transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
       ${isMobile ? "fixed inset-y-0 left-0 z-40 shadow-2xl" : "relative"}
-      ${open ? "w-64" : "w-[72px]"}
+      ${open ? "w-64 max-w-[85vw]" : "w-[72px]"}
       ${!open && isMobile ? "-translate-x-full shadow-none" : "translate-x-0"}
     `}>
       {/* Logo Section */}
@@ -137,7 +137,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto py-3 sm:py-4 px-2 sm:px-3 space-y-5 custom-scrollbar">
         {Object.entries(groupedItems).map(([groupLabel, items]) => (
           <div key={groupLabel}>
             {open && (
@@ -189,7 +189,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-800/30 flex-shrink-0 space-y-2">
+      <div className="p-2 sm:p-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-800/30 flex-shrink-0 space-y-1.5 sm:space-y-2">
         {/* Theme Toggle */}
         <button onClick={toggleTheme} className={`
           w-full rounded-xl border border-slate-200 dark:border-slate-700/60

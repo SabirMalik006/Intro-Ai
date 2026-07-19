@@ -489,7 +489,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-7rem)] flex flex-col">
+    <div className="h-full flex flex-col">
       <div className="flex-1 bg-white dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-300 dark:border-white/5 overflow-hidden flex flex-col lg:flex-row shadow-2xl shadow-slate-900/5">
         {/* ─── SIDEBAR ─── */}
         <div className={`lg:w-[380px] border-r border-slate-200/60 dark:border-white/5 flex flex-col bg-gradient-to-b from-white/50 to-slate-50/30 dark:from-slate-900/50 dark:to-slate-950/30 ${activeConvId ? 'hidden lg:flex' : 'flex'}`}>
@@ -666,10 +666,7 @@ export default function MessagesPage() {
                       <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         {otherParticipant.fullName}
                       </h4>
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="font-medium text-emerald-500">Online</span>
-                      </div>
+
                     </div>
                   </motion.button>
                 </div>

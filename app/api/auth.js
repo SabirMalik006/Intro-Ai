@@ -84,3 +84,54 @@ export function getGoogleAuthUrl() {
 export function loginWithGoogle() {
   window.location.href = getGoogleAuthUrl();
 }
+
+export async function forgotPassword(email) {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to send OTP');
+  }
+
+  return data;
+}
+
+export async function verifyOtp(email, otp) {
+  const response = await fetch(`${API_URL}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, otp }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'OTP verification failed');
+  }
+
+  return data;
+}
+
+export async function resetPassword(email, resetToken, newPassword) {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, resetToken, newPassword }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Password reset failed');
+  }
+
+  return data;
+}
