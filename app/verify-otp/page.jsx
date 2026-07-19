@@ -2,13 +2,21 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifyOtp, forgotPassword } from "../api/auth";
 import { useToast } from "@/components/Toast";
 import { KeyRound, ArrowLeft, Loader2, RefreshCw } from "lucide-react";
 
 export default function VerifyOtpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>}>
+      <VerifyOtpContent />
+    </Suspense>
+  );
+}
+
+function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
