@@ -323,7 +323,7 @@ export default function SavedJobsPage() {
                           onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(
-                              `http://localhost:3000/dashboard/explore-jobs/${job._id}`
+                              `${window.location.origin}/dashboard/explore-jobs/${job._id}`
                             );
                             toast("Link copied to clipboard!", "success");
                           }}

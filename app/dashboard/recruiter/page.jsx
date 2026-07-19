@@ -93,7 +93,7 @@ function ApplicantDetailsModal({ applicant, isOpen, onClose, onStatusChange, onA
                 </div>
               </div>
               <a 
-                href={applicant.resumeUrl ? `http://localhost:5000/${applicant.resumeUrl}` : "#"} 
+                href={applicant.resumeUrl ? `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000'}/${applicant.resumeUrl}` : "#"} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="px-6 py-3 bg-white text-indigo-600 rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-indigo-50 transition-all shadow-lg active:scale-95"
