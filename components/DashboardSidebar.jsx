@@ -137,7 +137,7 @@ export default function DashboardSidebar({ open, toggle, isMobile }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-none">
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5 custom-scrollbar">
         {Object.entries(groupedItems).map(([groupLabel, items]) => (
           <div key={groupLabel}>
             {open && (

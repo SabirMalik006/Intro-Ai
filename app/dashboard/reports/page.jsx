@@ -280,7 +280,7 @@ export default function ReportsPage() {
     const score = r.overallScore || 0;
 
     return (
-      <div className="space-y-5 max-w-4xl">
+      <div className="space-y-5 w-full">
         <AnimatePresence>
           {notif && (
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -314,7 +314,7 @@ export default function ReportsPage() {
                     {average > 0 && <motion.div initial={{ width: 0 }} animate={{ width: `${(average / total) * 100}%` }} transition={{ duration: 0.8, delay: 0.3 }} className="bg-amber-400" />}
                     {weak > 0 && <motion.div initial={{ width: 0 }} animate={{ width: `${(weak / total) * 100}%` }} transition={{ duration: 0.8, delay: 0.45 }} className="bg-red-400" />}
                   </div>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                       { label: 'Excellent', count: excellent, color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' },
                       { label: 'Good', count: good, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
@@ -462,18 +462,18 @@ export default function ReportsPage() {
               const rank = score >= 90 ? 'Top 5%' : score >= 80 ? 'Top 15%' : score >= 70 ? 'Top 30%' : score >= 60 ? 'Top 50%' : score >= 50 ? 'Top 70%' : 'Below Avg';
               const level = score >= 80 ? 'Advanced' : score >= 65 ? 'Intermediate' : score >= 50 ? 'Developing' : 'Beginner';
               return (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-200 dark:border-emerald-800 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-200 dark:border-emerald-800 text-center">
                     <span className="text-2xl mb-1 block">📊</span>
                     <p className="text-lg font-extrabold text-slate-800 dark:text-white">{rank}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Percentile</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/10 dark:to-cyan-900/10 border border-blue-200 dark:border-blue-800 text-center">
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/10 dark:to-cyan-900/10 border border-blue-200 dark:border-blue-800 text-center">
                     <span className="text-2xl mb-1 block">🎯</span>
                     <p className="text-lg font-extrabold text-slate-800 dark:text-white">{level}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Level</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800 text-center">
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-200 dark:border-amber-800 text-center">
                     <span className="text-2xl mb-1 block">📈</span>
                     <p className="text-lg font-extrabold text-slate-800 dark:text-white">{selected.answers.length}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Answered</p>
@@ -518,7 +518,7 @@ export default function ReportsPage() {
     const rec = r?.recommendation ? recommendationColors[r.recommendation] : null;
 
     return (
-      <div className="space-y-5 max-w-4xl">
+      <div className="space-y-5 w-full">
         <AnimatePresence>
           {notif && (
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -630,7 +630,7 @@ export default function ReportsPage() {
     const strong = completed.filter(i => i.report.recommendation === 'Strong Hire');
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <AnimatePresence>
           {notif && (
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -658,10 +658,10 @@ export default function ReportsPage() {
             <h1 className="text-2xl lg:text-3xl font-extrabold mb-1">Interview Reports</h1>
             <p className="text-white/50 text-sm font-medium">Track your performance across AI-powered interviews</p>
 
-            <div className="mt-5 grid grid-cols-3 gap-4 sm:gap-6 max-w-lg">
+            <div className="mt-5 grid grid-cols-3 gap-3 sm:gap-6 max-w-lg">
               {[
                 { label: 'Completed', value: completed.length, icon: '✅', color: 'from-emerald-400 to-emerald-300' },
-                { label: 'Passed', value: passed.length, icon: '🏆', color: 'from-blue-400 to-cyan-300' },
+                { label: 'Passed (65%+)', value: passed.length, icon: '🏆', color: 'from-blue-400 to-cyan-300' },
                 { label: 'Strong Hires', value: strong.length, icon: '⭐', color: 'from-amber-400 to-yellow-300' },
               ].map((stat, i) => (
                 <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 p-4 text-center">
@@ -765,7 +765,7 @@ export default function ReportsPage() {
   // ── RECRUITER LIST ──
   const completed = interviews.filter(i => i.report);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <AnimatePresence>
         {notif && (
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -819,11 +819,11 @@ export default function ReportsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.04 }}
-                className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer relative overflow-hidden"
+                className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer relative overflow-hidden"
                 onClick={() => setSelected(item)}
               >
-                <div className="flex items-center gap-5">
-                  <div className="hidden sm:flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-4 p-5">
+                  <div className="hidden sm:flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-slate-200 dark:border-slate-700 shrink-0">
                     <ScoreRing score={r.overallScore || 0} size={56} />
                   </div>
                   <div className="flex-1 min-w-0">

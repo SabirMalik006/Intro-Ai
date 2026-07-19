@@ -8,28 +8,37 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Area, AreaChart
 } from "recharts";
+import {
+  BarChart3, FileText, Briefcase, ClipboardList, Star, CheckCircle,
+  Mic, Award, Zap, File, AlertTriangle, TrendingUp, Target,
+  ChevronRight, Calendar, Plus, Sparkles, Lightbulb, Users,
+  Activity, ArrowUpRight
+} from "lucide-react";
 
-function StatCard({ title, value, icon, color, href }) {
-  const accentColors = {
-    blue: { icon: "from-blue-500 to-blue-600 bg-blue-100 border-blue-200 text-blue-600 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400", ring: "ring-blue-500/20" },
-    teal: { icon: "from-teal-500 to-teal-600 bg-teal-100 border-teal-200 text-teal-600 dark:bg-teal-900/20 dark:border-teal-800/50 dark:text-teal-400", ring: "ring-teal-500/20" },
-    amber: { icon: "from-amber-500 to-amber-600 bg-amber-100 border-amber-200 text-amber-600 dark:bg-amber-900/20 dark:border-amber-800/50 dark:text-amber-400", ring: "ring-amber-500/20" },
-    purple: { icon: "from-purple-500 to-purple-600 bg-purple-100 border-purple-200 text-purple-600 dark:bg-purple-900/20 dark:border-purple-800/50 dark:text-purple-400", ring: "ring-purple-500/20" },
-    rose: { icon: "from-rose-500 to-rose-600 bg-rose-100 border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800/50 dark:text-rose-400", ring: "ring-rose-500/20" },
+function StatCard({ title, value, icon: IconComponent, color, href }) {
+  const colors = {
+    blue: { icon: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/30", bar: "bg-blue-500", gradient: "from-blue-500/10 to-transparent", light: "bg-blue-500/5" },
+    teal: { icon: "text-teal-600 dark:text-teal-400", bg: "bg-teal-50 dark:bg-teal-900/30", bar: "bg-teal-500", gradient: "from-teal-500/10 to-transparent", light: "bg-teal-500/5" },
+    amber: { icon: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-900/30", bar: "bg-amber-500", gradient: "from-amber-500/10 to-transparent", light: "bg-amber-500/5" },
+    purple: { icon: "text-purple-600 dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-900/30", bar: "bg-purple-500", gradient: "from-purple-500/10 to-transparent", light: "bg-purple-500/5" },
+    rose: { icon: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-900/30", bar: "bg-rose-500", gradient: "from-rose-500/10 to-transparent", light: "bg-rose-500/5" },
   };
+  const c = colors[color] || colors.blue;
 
   return (
-    <div className={`${href ? 'cursor-pointer' : ''}`} onClick={() => href && window.location.assign(href)}>
-      <div className="bg-white/80 backdrop-blur-sm dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 hover:shadow-xl hover:border-slate-300 dark:hover:border-slate-600 shadow-sm transition-all duration-300 group relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white dark:to-transparent pointer-events-none" />
+    <div className={`${href ? 'cursor-pointer' : ''} group relative`} onClick={() => href && window.location.assign(href)}>
+      <div className="bg-white dark:bg-slate-900/95 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 hover:shadow-xl hover:border-slate-300 dark:hover:border-slate-600 shadow-sm transition-all duration-300 relative overflow-hidden h-full">
+        <div className={`absolute top-0 left-0 w-1.5 h-full ${c.bar} rounded-r-sm`} />
+        <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full bg-gradient-to-br ${c.gradient} blur-xl pointer-events-none" />
         <div className="relative">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 mb-4 ${accentColors[color].icon} shadow-sm`}>
-            <span className="text-2xl">{icon}</span>
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${c.bg} mb-5 shadow-sm`}>
+            <IconComponent className="w-6 h-6" />
           </div>
-          <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mb-1 tracking-tight">
+          <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mb-1.5 tracking-tight">
             {value ?? '—'}
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold">{title}</p>
+          <div className="h-px bg-gradient-to-r from-slate-200 via-slate-200/50 to-transparent dark:from-slate-700 dark:via-slate-700/50 mb-2.5" />
+          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{title}</p>
         </div>
       </div>
     </div>
@@ -182,10 +191,10 @@ function PieChartCard({ data }) {
   const categories = useMemo(() => {
     if (!data || data.length === 0) return [];
     const groups = [
-      { label: "Excellent", range: "80+", min: 80, color: PIE_COLORS[0], icon: "🏆" },
-      { label: "Good", range: "60-79", min: 60, max: 79, color: PIE_COLORS[1], icon: "⭐" },
-      { label: "Average", range: "40-59", min: 40, max: 59, color: PIE_COLORS[2], icon: "📊" },
-      { label: "Needs Work", range: "<40", max: 39, color: PIE_COLORS[3], icon: "💪" },
+      { label: "Excellent", range: "80+", min: 80, color: PIE_COLORS[0], icon: Award },
+      { label: "Good", range: "60-79", min: 60, max: 79, color: PIE_COLORS[1], icon: Star },
+      { label: "Average", range: "40-59", min: 40, max: 59, color: PIE_COLORS[2], icon: BarChart3 },
+      { label: "Needs Work", range: "<40", max: 39, color: PIE_COLORS[3], icon: Zap },
     ];
     const counts = [0, 0, 0, 0];
     data.forEach(d => {
@@ -218,7 +227,9 @@ function PieChartCard({ data }) {
 
       {total === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
-          <div className="text-4xl mb-3 opacity-40">📋</div>
+          <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-3">
+            <ClipboardList className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+          </div>
           <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">No analyses yet</p>
           <p className="text-slate-300 dark:text-slate-600 text-xs">Upload resumes to see quality breakdown</p>
         </div>
@@ -240,7 +251,7 @@ function PieChartCard({ data }) {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">{cat.icon}</span>
+                      <cat.icon className="w-3.5 h-3.5" style={{ color: cat.color }} />
                       <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">{cat.label}</span>
                     </div>
                     <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{cat.count}</div>
@@ -290,7 +301,7 @@ function RecentAnalyses({ analyses }) {
       <div className="bg-white/80 backdrop-blur-sm dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 shadow-sm">
         <div className="text-center py-10">
           <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-            <span className="text-3xl">📄</span>
+            <File className="w-8 h-8 text-slate-400 dark:text-slate-500" />
           </div>
           <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">No analyses yet</h4>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Upload your first resume for AI analysis</p>
@@ -326,7 +337,7 @@ function RecentAnalyses({ analyses }) {
           >
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center shadow-sm border border-indigo-200/50 dark:border-indigo-800/30">
-                <span className="text-lg">📄</span>
+                <File className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate max-w-[180px]">{item.filename}</h4>
@@ -365,7 +376,9 @@ function TopJobs({ jobs, userRole }) {
         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-6">Jump to your tools</p>
         <div className="space-y-4">
           <Link href="/dashboard/interview-room" className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 border border-indigo-200/60 dark:border-indigo-800/30 hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-700/50 transition-all group">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-500/20">🎤</div>
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg shadow-indigo-500/20">
+              <Mic className="w-5 h-5" />
+            </div>
             <div className="flex-1">
               <h4 className="font-bold text-slate-800 dark:text-slate-100">AI Mock Interview</h4>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Practice with AI interviewer</p>
@@ -375,7 +388,9 @@ function TopJobs({ jobs, userRole }) {
             </svg>
           </Link>
           <Link href="/dashboard/resume-analyzer" className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/10 dark:to-blue-900/10 border border-teal-200/60 dark:border-teal-800/30 hover:shadow-lg hover:border-teal-300 dark:hover:border-teal-700/50 transition-all group">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20">📊</div>
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20">
+              <BarChart3 className="w-5 h-5" />
+            </div>
             <div className="flex-1">
               <h4 className="font-bold text-slate-800 dark:text-slate-100">Analyze Resume</h4>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Get AI feedback on your resume</p>
@@ -422,7 +437,7 @@ function TopJobs({ jobs, userRole }) {
       ) : (
         <div className="text-center py-8 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
           <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <span className="text-xl">💼</span>
+            <Briefcase className="w-5 h-5 text-slate-400 dark:text-slate-500" />
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">No jobs posted yet</p>
         </div>
@@ -468,7 +483,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl">
           <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-red-200 dark:border-red-800/30">
-            <span className="text-3xl">⚠️</span>
+            <AlertTriangle className="w-7 h-7 text-red-500" />
           </div>
           <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Failed to load</h3>
           <p className="text-slate-500 dark:text-slate-400 mb-6 font-medium">{error}</p>
@@ -506,11 +521,11 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Resume Analyses" value={stats?.totalAnalyses ?? 0} icon="📊" color="blue" href="/dashboard/resume-analyzer" />
-        <StatCard title="Applications" value={stats?.totalApplications ?? 0} icon="📝" color="teal" href={user?.role === 'recruiter' ? '/dashboard/recruiter' : '/dashboard/explore-jobs'} />
-        <StatCard title={user?.role === 'recruiter' ? 'Active Jobs' : 'Avg. Score'} value={user?.role === 'recruiter' ? stats?.activeJobs ?? 0 : (stats?.avgScore ? `${stats.avgScore}%` : '—')} icon={user?.role === 'recruiter' ? '💼' : '⭐'} color="amber" />
-        <StatCard title={user?.role === 'recruiter' ? 'Total Jobs' : 'Analyses Done'} value={user?.role === 'recruiter' ? stats?.totalJobs ?? 0 : stats?.totalAnalyses ?? 0} icon={user?.role === 'recruiter' ? '📋' : '✅'} color="purple" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title="Resume Analyses" value={stats?.totalAnalyses ?? 0} icon={BarChart3} color="blue" href="/dashboard/resume-analyzer" />
+        <StatCard title="Applications" value={stats?.totalApplications ?? 0} icon={FileText} color="teal" href={user?.role === 'recruiter' ? '/dashboard/recruiter' : '/dashboard/explore-jobs'} />
+        <StatCard title={user?.role === 'recruiter' ? 'Active Jobs' : 'Avg. Score'} value={user?.role === 'recruiter' ? stats?.activeJobs ?? 0 : (stats?.avgScore ? `${stats.avgScore}%` : '—')} icon={user?.role === 'recruiter' ? Briefcase : Star} color="amber" />
+        <StatCard title={user?.role === 'recruiter' ? 'Total Jobs' : 'Analyses Done'} value={user?.role === 'recruiter' ? stats?.totalJobs ?? 0 : stats?.totalAnalyses ?? 0} icon={user?.role === 'recruiter' ? ClipboardList : CheckCircle} color="purple" />
       </div>
 
       {/* Charts Row 1 */}

@@ -76,8 +76,7 @@ export default function DashboardLayout({ children }) {
 
       {/* Main Content Area */}
       <main
-        className={`flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${isSidebarOpen && !isMobile ? "ml-0" : "ml-0"
-          }`}
+        className={`flex-1 overflow-y-auto custom-scrollbar transition-all duration-300 ease-in-out ${isSidebarOpen && !isMobile ? "ml-0" : "ml-0"}`}
       >
         <div className="p-4 lg:p-8 max-w-7xl mx-auto">
           {/* Mobile Header / Toggle (Visible only on small screens if sidebar is closed) */}

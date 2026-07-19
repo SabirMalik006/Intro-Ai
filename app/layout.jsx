@@ -1,5 +1,5 @@
 import "./globals.css";
-import ChatBot from "@/components/ChatBot";
+import ChatBotWrapper from "@/components/ChatBotWrapper";
 import ClientLayout from "@/components/ClientLayout";
 
 export default function RootLayout({ children }) {
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         <ClientLayout>
           {children}
         </ClientLayout>
-        <ChatBot />
+        <ChatBotWrapper />
       </body>
     </html>
   );

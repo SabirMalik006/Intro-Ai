@@ -39,6 +39,7 @@ export default function InterviewRoom() {
   const [evaluations, setEvaluations] = useState([]);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [aiStatusText, setAiStatusText] = useState("");
+  const [initError, setInitError] = useState("");
   const [answerError, setAnswerError] = useState("");
   const [showSetup, setShowSetup] = useState(true);
   const [interviewPhase, setInterviewPhase] = useState("setup"); // setup | answering | evaluating | report
@@ -52,12 +53,9 @@ export default function InterviewRoom() {
     { name: "James", role: "Technical Lead", img: "/ai-2.png" },
   ];
 
-  const [selectedAi, setSelectedAi] = useState(aiCharacters[0]);
-
-  useEffect(() => {
-    const randomAi = aiCharacters[Math.floor(Math.random() * aiCharacters.length)];
-    setSelectedAi(randomAi);
-  }, []);
+  const [selectedAi, setSelectedAi] = useState(
+    aiCharacters[Math.floor(Math.random() * aiCharacters.length)]
+  );
 
   // ─── ASSIGNMENT-BASED INTERVIEW ───
   useEffect(() => {
@@ -65,6 +63,7 @@ export default function InterviewRoom() {
 
     const initAssignment = async () => {
       setIsLoadingAI(true);
+      setInitError("");
       setAiStatusText("Loading your interview...");
       try {
         // Fetch current interview state
@@ -126,11 +125,12 @@ export default function InterviewRoom() {
           }
         }
       } catch (err) {
-        console.error('Failed to start assigned interview:', err);
-        setAiStatusText("Failed to load interview. Please try again.");
+        const msg = err?.message || err?.response?.data?.message || 'Failed to start interview. Please try again.';
+        console.error('Failed to start assigned interview:', msg);
+        setAiStatusText(msg);
+        setInitError(msg);
       } finally {
         setIsLoadingAI(false);
-        setAiStatusText("");
       }
     };
     initAssignment();
@@ -637,6 +637,15 @@ export default function InterviewRoom() {
                 </div>
 
                 <div className="bg-gray-800/50 border border-white/10 rounded-[2rem] p-6 space-y-4">
+                  {assignmentId && initError && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
+                      <span className="text-red-400 text-lg flex-shrink-0 mt-0.5">⚠️</span>
+                      <div>
+                        <p className="text-red-400 text-sm font-bold">{initError}</p>
+                        <button onClick={() => window.location.reload()} className="text-red-300/70 text-xs font-medium underline mt-1 hover:text-red-300 transition-colors">Try again</button>
+                      </div>
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Job Role *</label>
                     <input
