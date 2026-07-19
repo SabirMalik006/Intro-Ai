@@ -57,6 +57,13 @@ export default function InterviewRoom() {
     aiCharacters[Math.floor(Math.random() * aiCharacters.length)]
   );
 
+  const getPerformanceLabel = (score) => {
+    if (score >= 75) return "Best Performance";
+    if (score >= 46) return "Good";
+    if (score >= 20) return "Poor Performance";
+    return "Bad Performance";
+  };
+
   // ─── ASSIGNMENT-BASED INTERVIEW ───
   useEffect(() => {
     if (!assignmentId) return;
@@ -109,7 +116,9 @@ export default function InterviewRoom() {
           text: `Welcome back! I'm ${selectedAi.name}, your AI interviewer for the ${interview.jobRole} position. ${firstQ ? `Let's continue with the next question.\n\n${firstQ}` : 'All questions have been answered. Let me generate your final report.'}`,
           time: new Date().toLocaleTimeString()
         }]);
-        if (firstQ) speakText(`Welcome back! ${firstQ}`);
+        if (firstQ) {
+          setTimeout(() => speakText(`Welcome back! ${firstQ}`), 300);
+        }
 
         // If all questions already answered, skip to report
         if (qIdx >= (interview.questions?.length || 0)) {
@@ -147,28 +156,16 @@ export default function InterviewRoom() {
     if (!('speechSynthesis' in window) || isAiMuted) return;
     window.speechSynthesis.cancel();
 
-    const speak = () => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v =>
-        v.lang.startsWith('en') &&
-        (selectedAi.name === 'Sarah' ? (v.name.includes('Female') || v.gender === 'female') : (v.name.includes('Male') || v.gender === 'male'))
-      ) || voices[0];
-      if (preferredVoice) utterance.voice = preferredVoice;
-      utterance.onstart = () => setAiSpeaking(true);
-      utterance.onend = () => setAiSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-    };
-
+    const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      speak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        speak();
-      };
-    }
+    const preferredVoice = voices.find(v =>
+      v.lang.startsWith('en') &&
+      (selectedAi.name === 'Sarah' ? (v.name.includes('Female') || v.gender === 'female') : (v.name.includes('Male') || v.gender === 'male'))
+    );
+    if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.onstart = () => setAiSpeaking(true);
+    utterance.onend = () => setAiSpeaking(false);
+    try { window.speechSynthesis.speak(utterance); } catch (_) {}
   };
 
   useEffect(() => {
@@ -219,9 +216,8 @@ export default function InterviewRoom() {
 
     // Warm up speech synthesis in user gesture
     if ('speechSynthesis' in window) {
-      const u = new SpeechSynthesisUtterance('');
-      window.speechSynthesis.speak(u);
-      window.speechSynthesis.cancel();
+      window.speechSynthesis.getVoices();
+      try { window.speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } catch (_) {}
     }
 
     // Request camera permission in user gesture (test stream, stop immediately)
@@ -238,6 +234,9 @@ export default function InterviewRoom() {
     setIsLoadingAI(true);
     setAiStatusText("AI is preparing your interview questions...");
     setInterviewPhase("answering");
+
+    // Speak greeting immediately while questions load
+    speakText(`Hello I'm ${selectedAi.name}, your AI interviewer for the ${jobRole} position.`);
 
     try {
       const response = await api.post('/ai/interview/generate-questions', {
@@ -258,7 +257,7 @@ export default function InterviewRoom() {
         setChatMessages([
           { sender: "ai", text: `Hello! I'm ${selectedAi.name}, your AI interviewer for the ${jobRole} position. Let's begin with the first question.\n\n${firstQ}`, time: new Date().toLocaleTimeString() }
         ]);
-        speakText(`Hello I'm ${selectedAi.name}, your AI interviewer. Let's begin. ${firstQ}`);
+        setTimeout(() => { try { speakText(firstQ); } catch (_) {} }, 400);
       }
     } catch (error) {
       console.error("Failed to generate questions:", error);
@@ -386,7 +385,7 @@ export default function InterviewRoom() {
         const report = res.data.data.report;
         setInterviewReport(report);
         setInterviewPhase("report");
-        const reportMsg = `Thank you for completing the interview! Your overall score is ${report.overallScore}%.`;
+        const reportMsg = `Thank you for completing the interview! Your overall performance: ${getPerformanceLabel(report.overallScore)}.`;
         setChatMessages(prev => [
           ...prev,
           { sender: "ai", text: reportMsg, time: new Date().toLocaleTimeString() }
@@ -401,7 +400,7 @@ export default function InterviewRoom() {
         if (response.data.success) {
           setInterviewReport(response.data.data);
           setInterviewPhase("report");
-          const reportMsg = `Thank you for completing the interview! Your overall score is ${response.data.data.overallScore}%.`;
+          const reportMsg = `Thank you for completing the interview! Your overall performance: ${getPerformanceLabel(response.data.data.overallScore)}.`;
           setChatMessages(prev => [
             ...prev,
             { sender: "ai", text: reportMsg, time: new Date().toLocaleTimeString() }
@@ -617,7 +616,7 @@ export default function InterviewRoom() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-[#0a0f18] flex items-center justify-center p-6"
+              className="fixed inset-0 z-[100] bg-[#0a0f18] flex items-center justify-center p-2 sm:p-3 md:p-4"
             >
               <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-[120px]" />
               <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px]" />
@@ -626,17 +625,17 @@ export default function InterviewRoom() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="max-w-lg w-full relative z-10"
+                className="max-w-md w-full relative z-10 max-h-[95vh] overflow-hidden px-1 sm:px-2"
               >
-                <div className="text-center mb-8">
-                  <div className="w-20 h-20 mx-auto bg-gradient-to-br from-teal-500 to-indigo-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-2xl shadow-teal-500/20 rotate-3 border-4 border-white/10">
-                    <span className="text-4xl">🎯</span>
+                <div className="text-center mb-3">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-gradient-to-br from-teal-500 to-indigo-600 rounded-[1.4rem] flex items-center justify-center mb-3 shadow-xl shadow-teal-500/20 rotate-3 border-4 border-white/10">
+                    <span className="text-2xl sm:text-3xl">🎯</span>
                   </div>
-                  <h1 className="text-4xl font-black text-white mb-3 tracking-tight">AI Mock Interview</h1>
-                  <p className="text-gray-400">Enter the job role to get AI-generated interview questions tailored for you.</p>
+                  <h1 className="text-2xl sm:text-3xl font-black text-white mb-1 tracking-tight">AI Mock Interview</h1>
+                  <p className="text-xs sm:text-sm text-gray-400">Enter the job role to get AI-generated interview questions tailored for you.</p>
                 </div>
 
-                <div className="bg-gray-800/50 border border-white/10 rounded-[2rem] p-6 space-y-4">
+                <div className="bg-gray-800/50 border border-white/10 rounded-[1.4rem] p-3 sm:p-4 space-y-2">
                   {assignmentId && initError && (
                     <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
                       <span className="text-red-400 text-lg flex-shrink-0 mt-0.5">⚠️</span>
@@ -653,7 +652,7 @@ export default function InterviewRoom() {
                       value={jobRole}
                       onChange={(e) => setJobRole(e.target.value)}
                       placeholder="e.g. Full Stack Developer"
-                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-sm"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-sm"
                     />
                   </div>
                   <div>
@@ -663,7 +662,7 @@ export default function InterviewRoom() {
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Brief description of the role..."
                       rows={2}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-sm resize-none"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all text-sm resize-none"
                     />
                   </div>
                   <div>
@@ -684,7 +683,7 @@ export default function InterviewRoom() {
                   <button
                     onClick={startInterviewSession}
                     disabled={!jobRole.trim() || isLoadingAI}
-                    className={`w-full py-4 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
+                    className={`w-full py-3 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
                       jobRole.trim() && !isLoadingAI
                         ? 'bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-xl shadow-teal-500/20 hover:scale-[1.01] active:scale-[0.98]'
                         : 'bg-gray-700 text-gray-500 cursor-not-allowed'
@@ -698,15 +697,15 @@ export default function InterviewRoom() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-3 gap-2 mt-3">
                   {[
                     { icon: "🎤", text: "Voice Answers" },
                     { icon: "🤖", text: "AI Evaluation" },
                     { icon: "📊", text: "Detailed Report" },
                   ].map((item, i) => (
-                    <div key={i} className="p-4 bg-white/5 border border-white/10 rounded-[1.5rem] backdrop-blur-sm text-center">
-                      <div className="text-2xl mb-1">{item.icon}</div>
-                      <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{item.text}</div>
+                    <div key={i} className="p-2 bg-white/5 border border-white/10 rounded-[1rem] backdrop-blur-sm text-center">
+                      <div className="text-lg mb-0.5">{item.icon}</div>
+                      <div className="text-[7px] sm:text-[8px] font-black text-gray-400 uppercase tracking-widest">{item.text}</div>
                     </div>
                   ))}
                 </div>
@@ -1059,8 +1058,13 @@ export default function InterviewRoom() {
                       <h3 className="text-white font-bold text-lg mb-0.5">Overall Score</h3>
                       <p className="text-gray-500 text-xs">Based on your {interviewReport.totalQuestions || evaluations.length} responses</p>
                     </div>
-                    <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
-                      {interviewReport.overallScore}%
+                    <div className="text-right">
+                      <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
+                        {getPerformanceLabel(interviewReport.overallScore)}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {interviewReport.overallScore}% score
+                      </div>
                     </div>
                   </div>
 

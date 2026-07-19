@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, User, Sparkles, Mic, Paperclip, MessageSquare, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Send, Bot, User, Sparkles, MessageSquare, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import api from '@/services/api';
 
 const ChatBot = () => {
@@ -334,8 +334,6 @@ const ChatBot = () => {
               </form>
               <div className="flex items-center justify-between !mt-3 !px-1">
                 <div className="flex gap-4">
-                  <button type="button" className="text-gray-400 hover:text-blue-600 transition-all hover:scale-125"><Paperclip size={16} /></button>
-                  <button type="button" className="text-gray-400 hover:text-blue-600 transition-all hover:scale-125"><Mic size={16} /></button>
                 </div>
                 <div className="text-[9px] text-gray-400 font-black flex items-center gap-1.5 tracking-[0.05em] uppercase opacity-70">
                   <Sparkles size={10} className="text-amber-500" />

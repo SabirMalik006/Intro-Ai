@@ -806,7 +806,7 @@ function Hero() {
         backgroundSize: "60px 60px",
       }} />
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1, width: "100%", padding: "0 clamp(16px, 3vw, 40px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 1, width: "100%", padding: "0 clamp(8px, 1.2vw, 16px)" }}>
         <div className="hero-inner">
 
           {/* LEFT: Text column */}
@@ -846,7 +846,7 @@ function Hero() {
               fontSize: "clamp(1rem,1.5vw,1.15rem)", color: "rgba(240,239,232,0.6)",
               maxWidth: 480, lineHeight: 1.7, marginBottom: 48,
             }}>
-              SmartHire conducts professional AI interviews, evaluates candidates with precision, and delivers actionable insights — cutting hiring time by 80%.
+              SmartHire uses AI to conduct professional interviews, evaluate candidates accurately, and deliver clear insights — helping teams hire faster and smarter.
             </p>
 
             {/* CTA buttons */}
@@ -2536,6 +2536,16 @@ function Footer() {
     setFeedbackSubmitted(false);
   };
 
+  useEffect(() => {
+    if (feedbackOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+  }, [feedbackOpen]);
+
   const handleSubmitFeedback = () => {
     setFeedbackError("");
     if (!feedbackType) { setFeedbackError("Please select a feedback type."); return; }
@@ -2612,7 +2622,7 @@ function Footer() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 30 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              style={{ position: "relative", background: "#13131a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 28, padding: "40px 36px", maxWidth: 500, width: "100%", boxShadow: "0 40px 80px rgba(0,0,0,0.5)", maxHeight: "90vh", overflow: "auto" }}
+              style={{ position: "relative", background: "#13131a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 28, padding: "40px 36px", maxWidth: 500, width: "100%", boxShadow: "0 40px 80px rgba(0,0,0,0.5)", cursor: "auto", maxHeight: "90vh", overflow: "hidden" }}
             >
               <button onClick={() => { setFeedbackOpen(false); resetFeedback(); }} style={{ position: "absolute", top: 16, right: 16, width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#8a8a96", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.2s" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#f0efe8"; }}
@@ -2642,9 +2652,7 @@ function Footer() {
                 <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#8a8a96", marginBottom: 10, letterSpacing: "0.03em", textTransform: "uppercase" }}>Rating</label>
                 <div style={{ display: "flex", gap: 6 }}>
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <button key={star} onClick={() => setRating(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} style={{ width: 44, height: 44, borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.03)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", fontSize: 22 }}
-                      onMouseEnter={e => { setHoverRating(star); }}
-                    >
+                    <button key={star} onClick={() => setRating(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} style={{ width: 44, height: 44, borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.03)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", fontSize: 22 }}>
                       <span style={{ filter: star <= (hoverRating || rating) ? "none" : "grayscale(1)", opacity: star <= (hoverRating || rating) ? 1 : 0.3, transition: "all 0.2s" }}>★</span>
                     </button>
                   ))}
