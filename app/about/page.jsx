@@ -7,8 +7,26 @@ import { ArrowLeft, Sparkles, Code, Brain, Presentation, Target, CheckCircle2, S
 export default function AboutPage() {
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #0a0a0f 0%, #13131a 100%)", color: "#f0efe8", fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');`}</style>
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "60px 24px" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+        .team-card { display: flex; height: 100%; }
+        .team-card-img { width: 200px; min-height: 100%; flex-shrink: 0; }
+        .team-card-body { flex: 1; padding: 32px 36px; }
+        .wwd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+        @media (max-width: 768px) {
+          .team-card { flex-direction: column; }
+          .team-card-img { width: 100%; height: 220px; min-height: auto; }
+          .team-card-body { padding: 24px 20px; }
+          .wwd-grid { grid-template-columns: 1fr; }
+          .page-container { padding: 60px 24px !important; }
+        }
+        @media (max-width: 480px) {
+          .page-container { padding: 32px 16px !important; }
+        }
+      `}</style>
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "60px 24px" }}
+        className="page-container"
+      >
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#8a8a96", textDecoration: "none", fontSize: 14, fontWeight: 500, marginBottom: 48, transition: "color 0.2s" }}
           onMouseEnter={e => e.currentTarget.style.color = "#c8f135"}
           onMouseLeave={e => e.currentTarget.style.color = "#8a8a96"}
@@ -51,7 +69,7 @@ export default function AboutPage() {
             </div>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "1.2rem" }}>What We Do</h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+          <div className="wwd-grid">
             {[
               "AI-conducted interviews that feel natural and professional",
               "Real-time resume analysis with ATS compatibility scoring",
@@ -137,9 +155,9 @@ export default function AboutPage() {
                 e.currentTarget.style.boxShadow = `0 4px 30px ${member.color}08`;
               }}
             >
-              <div style={{ display: "flex", height: "100%" }}>
+              <div className="team-card">
                 {/* Left: full-height image */}
-                <div style={{ width: 200, minHeight: "100%", flexShrink: 0, overflow: "hidden", position: "relative" }}>
+                <div className="team-card-img" style={{ overflow: "hidden", position: "relative" }}>
                   <div style={{
                     position: "absolute", inset: 0,
                     background: `linear-gradient(135deg, ${member.color}, ${member.color}cc)`,
@@ -157,7 +175,7 @@ export default function AboutPage() {
                 </div>
 
                 {/* Right: content */}
-                <div style={{ flex: 1, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="team-card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                     <h3 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20, margin: 0, letterSpacing: "-0.01em" }}>{member.name}</h3>
                     <motion.span
